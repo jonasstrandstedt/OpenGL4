@@ -93,6 +93,12 @@ bool gl4::Engine::initGL() {
 			_initFunc();
 		}
 
+		// set callbacks
+		if (_keyboardCallbackFunc != 0)
+		{
+			glfwSetKeyCallback(_keyboardCallbackFunc);
+		}
+		
 		
 		return true;
 	} 
@@ -150,7 +156,7 @@ void gl4::Engine::render() {
 		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-		gl4::ShaderManager::getInstance()->bindTextured();
+		gl4::ShaderManager::getInstance()->bindShader("Textured");
 
 		// orthogonal projection
 		setOrthogonalProjection();

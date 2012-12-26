@@ -142,12 +142,9 @@ void gl4::FBO::unbind() {
 		0, 0, _w, _h,
 		0, 0, _w, _h,
 		GL_COLOR_BUFFER_BIT, GL_NEAREST);
-}
-
-
-glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glDisable(GL_MULTISAMPLE);
-glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void gl4::FBO::clear() {
@@ -163,8 +160,6 @@ void gl4::FBO::clear() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	
-	
 }
 
 GLuint gl4::FBO::getTexture()

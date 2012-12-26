@@ -1,6 +1,5 @@
 #include "Engine.h"
 #include "ShaderManager.h"
-#include "VBO.h"
 
 #include <iostream>
 
@@ -21,6 +20,7 @@ int main(int argc, char **argv) {
 	engine = new gl4::Engine(argc, argv);
 	
 	// set callbacks
+	engine->setKeyBoardCallbackfunc(keyboardCallback);
 	engine->setRenderFunc(myRenderFunc);
 	engine->setInitFunc(myInitFunc);
 	
@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
 	engine->render();
 
 	// cleanup
+	delete obj;
 	delete engine;
 
 	// return success
@@ -55,7 +56,7 @@ void myRenderFunc(void) {
 
 	float t =glfwGetTime();
 
-	gl4::ShaderManager::getInstance()->bindPassthrough();
+	gl4::ShaderManager::getInstance()->bindShader("Passthrough");
 	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),t*50.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	engine->setPerspectiveProjection(transform);
 	obj->render();

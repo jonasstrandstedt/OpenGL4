@@ -2,7 +2,9 @@
 #define SHADERMANAGER_H
 
 #include "Engine.h"
+#include <string>
 #include <vector>
+#include <map>
 
 namespace gl4
 {
@@ -16,15 +18,15 @@ namespace gl4
 
 		GLuint getShaderProgram(unsigned int i);
 		void bindShader(unsigned int i);
-		void bindPassthrough() { bindShader(0);};
-		void bindTextured() { bindShader(1);};
+		GLuint getShaderProgram(std::string shader);
+		void bindShader(std::string shader);
 		void unbindShader();
 
 	private:
 		ShaderManager();
 		static ShaderManager* _instance;
 
-		std::vector<GLuint> _shaders;
+		std::map< std::string, GLuint > _shaders;
 
 		char* _readShaderFile(const char *filename);
 		GLuint _createShader(const char *vertfilename, const char *fragfilename);

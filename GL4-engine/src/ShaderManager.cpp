@@ -17,8 +17,13 @@ gl4::ShaderManager* gl4::ShaderManager::getInstance()
 gl4::ShaderManager::ShaderManager()
 {
 	std::cout << "Initializing ShaderManager" << std::endl;
-	_shaders.push_back(_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag"));
-	_shaders.push_back(_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag"));
+
+	_shaders.insert( std::pair<std::string,GLuint>("Passthrough", _createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag")));
+
+	_shaders.insert( std::pair<std::string,GLuint>("Textured", _createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag")));
+
+	//_shaders.push_back(_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag"));
+	//_shaders.push_back(_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag"));
 }
 
 gl4::ShaderManager::~ShaderManager()
@@ -27,11 +32,38 @@ gl4::ShaderManager::~ShaderManager()
 }
 
 
+GLuint gl4::ShaderManager::getShaderProgram(std::string shader)
+{
+	std::map< std::string,GLuint >::iterator it;
+	it = _shaders.find(shader);
+	if (it != _shaders.end())
+	{
+		return (*it).second;
+	} else {
+		return 0;
+	}
+}
+void gl4::ShaderManager::bindShader(std::string shader)
+{
+	std::map< std::string,GLuint >::iterator it;
+	it = _shaders.find(shader);
+	if (it != _shaders.end())
+	{
+		glUseProgram( (*it).second);
+	} else {
+		glUseProgram(0);
+	}
+}
 GLuint gl4::ShaderManager::getShaderProgram(unsigned int i)
 {
 	if (i < _shaders.size())
 	{
- 	 	return _shaders.at(i);
+		std::map< std::string,GLuint >::iterator it = _shaders.begin();
+		for (int j = 0; j < i; ++j)
+		{
+			it++;
+		}
+ 	 	return (*it).second;
 	}
  	return 0;
 }
@@ -40,7 +72,12 @@ void gl4::ShaderManager::bindShader(unsigned int i)
 {
 	if (i < _shaders.size())
 	{
- 	 	glUseProgram( _shaders.at(i) );
+		std::map< std::string,GLuint >::iterator it = _shaders.begin();
+		for (int j = 0; j < i; ++j)
+		{
+			it++;
+		}
+ 	 	glUseProgram( (*it).second );
 	} else {
 		glUseProgram( 0 );
 	}
@@ -133,26 +170,29 @@ GLuint gl4::ShaderManager::_createShader(const char *vertfilename, const char *f
 	std::cout << "Creating shader program [" << programObj << "]: " << std::endl;
 	std::cout << "   " << vertfilename << std::endl;
 	std::cout << "   " << fragfilename << std::endl;
+	
 	std::cout << "Attribute positions (-1 if unused in shader): " << std::endl;
 
-	glUseProgram( programObj );
-	GLint pos_loc = glGetAttribLocation( programObj, "vertex_position");
-	GLint tex_loc = glGetAttribLocation( programObj, "vertex_tex");
-	GLint normal_loc = glGetAttribLocation( programObj, "vertex_normal");
-	GLint color_loc = glGetAttribLocation( programObj, "vertex_color");
-	GLint attrib3f_loc = glGetAttribLocation( programObj, "vertex_attribute3f");
-	GLint attrib1f_loc = glGetAttribLocation( programObj, "vertex_attribute1f");
-	GLint mvp_loc = glGetUniformLocation( programObj, "MVP");
-	GLint teximage_loc = glGetUniformLocation( programObj, "teximage");
-	std::cout << "   " << "vertex_position = " << pos_loc << std::endl;
-	std::cout << "   " << "vertex_tex = " << tex_loc << std::endl;
-	std::cout << "   " << "vertex_normal = " << normal_loc << std::endl;
-	std::cout << "   " << "vertex_color = " << color_loc << std::endl;
-	std::cout << "   " << "vertex_attribute3f = " << attrib3f_loc << std::endl;
-	std::cout << "   " << "vertex_attributef = " << attrib1f_loc << std::endl;
-	std::cout << "   " << "MVP = " << mvp_loc << std::endl;
-	std::cout << "   " << "teximage = " << teximage_loc << std::endl;
-	glUseProgram( 0 );
+	// for debugging
+	// glUseProgram( programObj );
+	// GLint pos_loc = glGetAttribLocation( programObj, "vertex_position");
+	// GLint tex_loc = glGetAttribLocation( programObj, "vertex_tex");
+	// GLint normal_loc = glGetAttribLocation( programObj, "vertex_normal");
+	// GLint color_loc = glGetAttribLocation( programObj, "vertex_color");
+	// GLint attrib3f_loc = glGetAttribLocation( programObj, "vertex_attribute3f");
+	// GLint attrib1f_loc = glGetAttribLocation( programObj, "vertex_attribute1f");
+	// GLint mvp_loc = glGetUniformLocation( programObj, "MVP");
+	// GLint teximage_loc = glGetUniformLocation( programObj, "teximage");
+	// std::cout << "   " << "vertex_position = " << pos_loc << std::endl;
+	// std::cout << "   " << "vertex_tex = " << tex_loc << std::endl;
+	// std::cout << "   " << "vertex_normal = " << normal_loc << std::endl;
+	// std::cout << "   " << "vertex_color = " << color_loc << std::endl;
+	// std::cout << "   " << "vertex_attribute3f = " << attrib3f_loc << std::endl;
+	// std::cout << "   " << "vertex_attributef = " << attrib1f_loc << std::endl;
+	// std::cout << "   " << "MVP = " << mvp_loc << std::endl;
+	// std::cout << "   " << "teximage = " << teximage_loc << std::endl;
+	// glUseProgram( 0 );
+
 
 	return programObj;
 }
