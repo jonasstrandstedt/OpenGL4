@@ -1,23 +1,12 @@
 #include "Engine.h"
-#include "ShaderManager.h"
-#include <iostream>
-#include <iomanip>
-#include <cstdlib>
-#include <cstdio>
 
 gl4::Engine::Engine(int argc, char **argv) {
 	_doRender = true;
 
 	_keyboardCallbackFunc = 0;
+	_updateFunc = 0;
 	_renderFunc = 0;
 	_initFunc = 0;
-
-	int nrofkeys = 256;
-	_keyboardKeyPressed = (bool*)std::malloc(nrofkeys*sizeof(bool));
-	for (int i = 0; i < nrofkeys; ++i)
-	{
-		_keyboardKeyPressed[i] = false;
-	}
 
 	_windowWidth = 800;
 	_windowHeight = 600;
@@ -39,18 +28,28 @@ gl4::Engine::Engine(int argc, char **argv) {
 
 bool gl4::Engine::initGL() {
 
-
+	//init glfw and set start time
 	glfwInit();
-	
+	_t0 = glfwGetTime();
+
+#ifdef __APPLE__
+	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
+	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
+#else
 	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 4 );
 	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 3 );
+#endif
 	glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, GL_TRUE );
 	
+	// open window
 	glfwOpenWindow( _windowWidth, _windowHeight, 0, 0, 0, 0, 0, 0, GLFW_WINDOW );
+
+	// check if window opened correctly
 	if( glfwGetWindowParam( GLFW_OPENED ) ) {
 
+		// init GLEW with experimental features
 		glewExperimental = GL_TRUE;
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
@@ -61,16 +60,16 @@ bool gl4::Engine::initGL() {
 		// glew init with "glewExperimental = GL_TRUE" fires an error
 		GLenum errorID = glGetError();
 
+		// fetching versions
 		char buffer [50];
 		const char *format = "%-12s %i.%i.%i";
 		int GLFWmajor = 0, GLFWminor = 0, GLFWrev = 0;
 		int OpenGLmajor = 0, OpenGLminor = 0, OpenGLrev = 0;
-
 		glfwGetVersion( &GLFWmajor, &GLFWminor, &GLFWrev );
 		OpenGLmajor = glfwGetWindowParam(GLFW_OPENGL_VERSION_MAJOR);
 		OpenGLminor = glfwGetWindowParam(GLFW_OPENGL_VERSION_MINOR);
 
-
+		// printing versions
 		std::cout << "Using versions: " << std::endl;
 		std::sprintf (buffer, format, "GLFW:", GLFWmajor, GLFWminor, GLFWrev );
 		std::cout << buffer << std::endl;
@@ -83,11 +82,16 @@ bool gl4::Engine::initGL() {
 		glfwSetWindowTitle( buffer );
 
 		
+		// init shaders
 		gl4::ShaderManager::getInstance();
 
-		_standard.init(_windowWidth, _windowHeight, 32);
+		// init FBO with same size as window with 32 samples/pixel
+		_standard.init(_windowWidth, _windowHeight, 32,3);
+
+		// init fullscreen quad
 		_quad.init(_windowWidth,_windowHeight);
 
+		// call user defined init 
 		if (_initFunc != 0)
 		{
 			_initFunc();
@@ -98,13 +102,11 @@ bool gl4::Engine::initGL() {
 		{
 			glfwSetKeyCallback(_keyboardCallbackFunc);
 		}
-		
-		
+
 		return true;
 	} 
-
+	// if unable to open window, print error
 	std::cerr << "Could not open window" << std::endl;
-
 	return false;
 }
 
@@ -119,6 +121,9 @@ void gl4::Engine::setKeyBoardCallbackfunc(void (*f)(int, int)) {
 void gl4::Engine::setRenderFunc(void (*f)(void)) {
 	_renderFunc = f;
 }
+void gl4::Engine::setUpdateFunc(void (*f)(float)) {
+	_updateFunc = f;
+}
 void gl4::Engine::setInitFunc(void (*f)(void)) {
 	_initFunc = f;
 }
@@ -126,20 +131,33 @@ void gl4::Engine::setWindowTitle(const char *title) {
 	glfwSetWindowTitle( title );
 }
 
-void gl4::Engine::setPerspectiveProjection(glm::mat4 transform)
+void gl4::Engine::usePerspectiveProjection(glm::mat4 transform)
 {
-	glm::mat4 finaltransform = _perspectiveProjectionMatrix * transform;
-	glUniformMatrix4fv(0, 1, GL_FALSE, &finaltransform[0][0]);
+	glUniformMatrix4fv(0, 1, GL_FALSE, &_perspectiveProjectionMatrix[0][0]);
+	glUniformMatrix4fv(1, 1, GL_FALSE, &transform[0][0]);
 }
 
-void gl4::Engine::setOrthogonalProjection(glm::mat4 transform)
+void gl4::Engine::useOrthogonalProjection(glm::mat4 transform)
 {
-	glm::mat4 finaltransform = _orthogonalProjectionMatrix * transform;
-	glUniformMatrix4fv(0, 1, GL_FALSE, &finaltransform[0][0]);
+	glUniformMatrix4fv(0, 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
+	glUniformMatrix4fv(1, 1, GL_FALSE, &transform[0][0]);
 }
 
 void gl4::Engine::render() {
 	while(_doRender) {
+
+		double t = glfwGetTime();
+		// Handle all the updates
+		if (_updateFunc != 0)
+		{
+			_updateFunc(static_cast<float>(t - _t0));
+		}
+		_t0 = t;
+
+
+		// Clear color buffer
+		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		// render user content to fullscreen FBO to enable post-processing capabilities
 		_standard.clear();
@@ -150,21 +168,14 @@ void gl4::Engine::render() {
 		}
 		_standard.unbind();
 
-
-
-		// Clear color buffer
-		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-		gl4::ShaderManager::getInstance()->bindShader("Textured");
+		gl4::ShaderManager::getInstance()->bindShader("Deferred2");
 
 		// orthogonal projection
-		setOrthogonalProjection();
+		useOrthogonalProjection();
 
+		glUniform3f(2, 0,1,3);
 		// render the FBO texture
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _standard.getTexture());
-		glUniform1i(1, 0);
+		_standard.bindTextures(3);
 
 		_quad.render();
 
@@ -176,7 +187,7 @@ void gl4::Engine::render() {
 		glfwSwapBuffers();
 
 		// exit if user press ESC
-		if ( glfwGetKey( GLFW_KEY_ESC ) == GLFW_PRESS )
+		if ( glfwGetKey( GLFW_KEY_ESC ) == GLFW_PRESS || !glfwGetWindowParam( GLFW_OPENED ) )
 			_stopRender();
 	}
 }
@@ -184,33 +195,3 @@ void gl4::Engine::render() {
 void gl4::Engine::_stopRender() {
 	_doRender = false;
 }
-/*
-void* gl4::Engine::checkKeyboardInput(void *in)
-{
-	while( ! shutdown ) {
-		usleep(20000);
-		for (int i = 0; i < 256; ++i)
-		{
-			if(_keyboardKeyPressed[i]) {
-				if(glfwGetKey( i ) == GLFW_RELEASE) {
-					if (_keyboardCallbackFunc != 0)
-					{
-						_keyboardCallbackFunc(i, ENGINE_RELEASE);
-					}
-					_keyboardKeyPressed[i] = false;
-				}
-			} else {
-				if(glfwGetKey( i ) == GLFW_PRESS) {
-					if (_keyboardCallbackFunc != 0)
-					{
-						_keyboardCallbackFunc(i, ENGINE_PRESS);
-					}
-					_keyboardKeyPressed[i] = true;
-				}
-			}
-		}
-	}
-	free(_keyboardKeyPressed);
-	pthread_exit(NULL);
-}
-*/

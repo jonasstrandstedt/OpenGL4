@@ -5,7 +5,6 @@
 
 gl4::ShaderManager* gl4::ShaderManager::_instance = 0;
 
-
 gl4::ShaderManager* gl4::ShaderManager::getInstance()
 {
 	//WARNING _ NOT THREAD SAFE
@@ -18,12 +17,34 @@ gl4::ShaderManager::ShaderManager()
 {
 	std::cout << "Initializing ShaderManager" << std::endl;
 
-	_shaders.insert( std::pair<std::string,GLuint>("Passthrough", _createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag")));
+	_shaders.insert( 
+		std::pair<std::string,GLuint>(
+			"Passthrough", 
+			_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag")
+		)
+	);
 
-	_shaders.insert( std::pair<std::string,GLuint>("Textured", _createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag")));
+	_shaders.insert( 
+		std::pair<std::string,GLuint>(
+			"Textured", 
+			_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag")
+		)
+	);
 
-	//_shaders.push_back(_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag"));
-	//_shaders.push_back(_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag"));
+	_shaders.insert( 
+		std::pair<std::string,GLuint>(
+			"Deferred1", 
+			_createShader("GL4-engine/shaders/Deferred.vert","GL4-engine/shaders/Deferred1.frag")
+		)
+	);
+
+	_shaders.insert( 
+		std::pair<std::string,GLuint>(
+			"Deferred2", 
+			_createShader("GL4-engine/shaders/Deferred.vert","GL4-engine/shaders/Deferred2.frag")
+		)
+	);
+
 }
 
 gl4::ShaderManager::~ShaderManager()
@@ -85,7 +106,6 @@ void gl4::ShaderManager::bindShader(unsigned int i)
 }
 void gl4::ShaderManager::unbindShader() 
 {
-
 	glUseProgram( 0 );
 }
 
@@ -171,9 +191,9 @@ GLuint gl4::ShaderManager::_createShader(const char *vertfilename, const char *f
 	std::cout << "   " << vertfilename << std::endl;
 	std::cout << "   " << fragfilename << std::endl;
 	
-	std::cout << "Attribute positions (-1 if unused in shader): " << std::endl;
 
 	// for debugging
+	// std::cout << "Attribute positions (-1 if unused in shader): " << std::endl;
 	// glUseProgram( programObj );
 	// GLint pos_loc = glGetAttribLocation( programObj, "vertex_position");
 	// GLint tex_loc = glGetAttribLocation( programObj, "vertex_tex");

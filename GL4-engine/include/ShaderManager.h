@@ -3,7 +3,6 @@
 
 #include "Engine.h"
 #include <string>
-#include <vector>
 #include <map>
 
 namespace gl4

@@ -57,9 +57,9 @@ ifdef OPENGL
 	ifeq ($(OS),Linux)
 		FLAGS += -lglfw -lGL -lGLU -lGLEW
 	else ifeq ($(OS),Darwin)
-		FLAGS += -framework Cocoa -framework OpenGL -lglfw
+		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW
 	else ifeq ($(OS),MinGW)
-		FLAGS += -lglfw
+		FLAGS += -lglfw 
 	endif
 endif
 
