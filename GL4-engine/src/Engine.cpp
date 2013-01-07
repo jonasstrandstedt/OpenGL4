@@ -113,8 +113,9 @@ bool gl4::Engine::initGL() {
 		glfwSetWindowTitle( buffer );
 
 		
-		// init shaders
+		// init managers
 		gl4::ShaderManager::getInstance();
+		gl4::TextureManager::getInstance();
 
 		// init FBO with same size as window with 32 samples/pixel and 3 textures
 		_standard.init(_windowWidth, _windowHeight, 32,3);

@@ -23,6 +23,7 @@ OBJECTS += GL4-engine/src/Engine.o
 OBJECTS += GL4-engine/src/VBO.o
 OBJECTS += GL4-engine/src/FBO.o
 OBJECTS += GL4-engine/src/ShaderManager.o
+OBJECTS += GL4-engine/src/TextureManager.o
 OBJECTS += GL4-engine/src/Sphere.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well

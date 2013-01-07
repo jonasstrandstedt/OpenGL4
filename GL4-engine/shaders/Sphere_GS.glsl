@@ -17,8 +17,7 @@ layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
 layout(location = 3) uniform sampler2D teximage;
 layout(location = 4) uniform sampler2D heightimage;
-layout(location = 5) uniform float TessLevelInner;
-layout(location = 6) uniform float TessLevelOuter;
+layout(location = 5) uniform float TessLevel;
 
 layout(location = 0) in vec3 te_position[3];
 layout(location = 1) in vec2 te_tex[3];

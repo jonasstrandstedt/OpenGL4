@@ -16,8 +16,7 @@ layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
 layout(location = 3) uniform sampler2D teximage;
 layout(location = 4) uniform sampler2D heightimage;
-layout(location = 5) uniform float TessLevelInner;
-layout(location = 6) uniform float TessLevelOuter;
+layout(location = 5) uniform float TessLevel;
 
 layout(location = 0) in vec3 tc_position[];
 layout(location = 1) in vec2 tc_tex[];
@@ -25,9 +24,6 @@ layout(location = 1) in vec2 tc_tex[];
 layout(location = 0) out vec3 te_position;
 layout(location = 1) out vec2 te_tex;
 layout(location = 2) out vec3 te_normal;
-//layout(location = 1) out vec3 tePatchDistance;
-
-
 
 void main()
 {
@@ -40,19 +36,11 @@ void main()
     vec3 p1 = gl_TessCoord.y * tc_position[1];
     vec3 p2 = gl_TessCoord.z * tc_position[2];
 
-    float dist = 1.0+length(texture2D(heightimage, te_tex).xyz) / 4.0;
+    float dist = 1.0+length(texture2D(heightimage, te_tex).xyz)/10.0;
 
-/*
-    if(te_tex.x < 0.0 || te_tex.x > 1.0 || te_tex.y < 0.0 || te_tex.y > 1.0)
-        dist = 0.0;
-*/
-    //;
     te_normal = normalize(p0 + p1 + p2);
 
     te_position = (ModelTransform * vec4(normalize(p0 + p1 + p2)*dist,1)).xyz;
-
-    
-
 
     gl_Position = Projection * vec4(te_position, 1);
 }

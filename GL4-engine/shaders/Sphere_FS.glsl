@@ -14,8 +14,7 @@ layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
 layout(location = 3) uniform sampler2D teximage;
 layout(location = 4) uniform sampler2D heightimage;
-layout(location = 5) uniform float TessLevelInner;
-layout(location = 6) uniform float TessLevelOuter;
+layout(location = 5) uniform float TessLevel;
 
 layout(location = 0) in vec2 st;
 layout(location = 1) in vec3 stp;
@@ -30,13 +29,13 @@ layout(location = 2) out vec4 normal;
 void main()
 {
 
-	float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
-	if(dist < 0.01) {
-		diffuse = vec4(1,1,1,1);
-	} else {
+	//float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
+	//if(dist < 0.01) {
+	//	diffuse = vec4(1,1,1,1);
+	//} else {
 		diffuse = texture2D(teximage, st);
 		//diffuse = vec4(1,0,0,1);
-	}
+	//}
 
 	position = vec4(stp,1);
 	normal = vec4(fragment_normal,1);

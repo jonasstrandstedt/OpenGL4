@@ -12,11 +12,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 gl4::VBO *obj;
 gl4::Sphere *sphere;
-gl4::Sphere *sphere_notess;
 gl4::Engine *engine;
 glm::vec2 angle;
-
-GLuint textureID[2];
 
 int tess;
 
@@ -24,24 +21,6 @@ void keyboardCallback(int key, int state);
 void myRenderFunc(void);
 void myInitFunc(void);
 void myUpdateFunc(float dt);
-
-void loadTexture(const char *filename, GLuint texID) {
-  
-  GLFWimage img;
-
-  if(!glfwReadImage(filename, &img, GLFW_NO_RESCALE_BIT))
-  	std::cerr << "Failed to load texture from TGA file." << std::endl;
-  
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture( GL_TEXTURE_2D, texID );
-
-  glfwLoadTextureImage2D( &img, 0 );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-  glfwFreeImage(&img); // Clean up the malloc()'ed data pointer
-}
 
 int main(int argc, char **argv) {
 
@@ -63,6 +42,7 @@ int main(int argc, char **argv) {
 	engine->render();
 
 	// cleanup
+	delete sphere;
 	delete obj;
 	delete engine;
 
@@ -72,7 +52,6 @@ int main(int argc, char **argv) {
 
 void keyboardCallback(int key, int state) 
 {
-
 	// increase and decrease tessellation levels
 	if(key == 'I' && state == GLFW_PRESS) {
 		if(tess < 64)
@@ -100,12 +79,8 @@ void myInitFunc(void)
 	tess = 1;
 
 	// load textures
-	textureID[0]= 0;
-	textureID[1]= 0;
-	glGenTextures(2, textureID);
-	loadTexture("data/earth_nasa.tga",textureID[0]);
-	loadTexture("data/earth_height.tga",textureID[1]);
-	glBindTexture(GL_TEXTURE_2D,0);
+	gl4::TextureManager::getInstance()->loadTexture("earth_diffuse", "data/earth_nasa_lowres.tga");
+	gl4::TextureManager::getInstance()->loadTexture("earth_displacement", "data/earth_nasa_topography_lowres.tga");
 }
 
 void myRenderFunc(void) 
@@ -125,12 +100,12 @@ void myRenderFunc(void)
 
 	// bind earth texture
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID[0]);
+	glBindTexture(GL_TEXTURE_2D, gl4::TextureManager::getInstance()->getTexture("earth_diffuse"));
 	glUniform1i(3, 0);
 
 	// bind heightmap
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, textureID[1]);
+	glBindTexture(GL_TEXTURE_2D,  gl4::TextureManager::getInstance()->getTexture("earth_displacement"));
 	glUniform1i(4, 1);
 
 	// rotate around the x-axis and y-axis
@@ -139,10 +114,7 @@ void myRenderFunc(void)
 	engine->usePerspectiveProjection(transform);
 
 	// set tessellation levels
-	glUniform1f(5, tess); // inner
-	glUniform1f(6, tess); // outer
-	glUniform2f(7, 800.0,600.0);
-	glUniform1f(8, 100.0); // LOD
+	glUniform1f(5, tess); // set tessellation level
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 	sphere->render();
 
@@ -154,7 +126,7 @@ void myRenderFunc(void)
 
 void myUpdateFunc(float dt)
 {
-	angle[1] += dt*10;
+	//angle[1] += dt*10;
 
 	float speed = 50.0f;
 	if(engine->isKeyPressed(GLFW_KEY_RIGHT)) {
