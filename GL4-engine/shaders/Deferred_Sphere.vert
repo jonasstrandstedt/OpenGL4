@@ -13,6 +13,7 @@ layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
 
+
 layout(location = 0) in vec3 vertex_position;
 layout(location = 1) in vec2 vertex_tex;
 layout(location = 2) in vec3 vertex_normal;
@@ -31,10 +32,10 @@ void main()
 
 	st = vertex_tex;
 	stp = vertex_position;
-	fragment_normal = normalize(ModelTransform * vec4(vertex_normal,1));
+	fragment_normal = vec4(vertex_normal,1);
 	fragment_color = vertex_color;
-	fragment_position = ModelTransform * vec4(vertex_position,1);
+	fragment_position = vec4(vertex_position,1);
 
-	gl_Position =  Projection * fragment_position;
+	gl_Position =  fragment_position;
 
 }

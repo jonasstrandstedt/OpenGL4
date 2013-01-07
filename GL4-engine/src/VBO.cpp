@@ -1,3 +1,12 @@
+/**
+Copyright (C) 2012-2014 Jonas Strandstedt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #include "VBO.h"
 #include <cstdlib>
 #include <iostream>
@@ -11,6 +20,7 @@ gl4::VBO::VBO()
 	_vsize = 0;
 	_varray = NULL;
 	_iarray = NULL;
+	_mode = GL_POINTS;
 }
 gl4::VBO::~VBO() 
 {
@@ -23,6 +33,7 @@ void gl4::VBO::init(float w, float h)
 	if(_vsize == 0 || _isize == 0 || _varray == NULL || _iarray == NULL) {
 
 		std::cout << "VBO: Init color quad" << std::endl;
+		_mode = GL_TRIANGLES;
 
 		_vsize = 4;
 		_isize = 6;
@@ -136,6 +147,6 @@ void gl4::VBO::render()
 {
 	glBindVertexArray(_vaoID);		// select first VAO
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glDrawElements(GL_TRIANGLES, _isize, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+	glDrawElements(_mode, _isize, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 	glBindVertexArray(0);
 }

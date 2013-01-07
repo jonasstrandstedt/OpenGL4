@@ -9,32 +9,36 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 #version 430
 
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
 layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
 
-layout(location = 0) in vec3 vertex_position;
-layout(location = 1) in vec2 vertex_tex;
-layout(location = 2) in vec3 vertex_normal;
-layout(location = 3) in vec4 vertex_color;
-layout(location = 4) in vec3 vertex_attribute3f;
-layout(location = 5) in float vertex_attribute1f;
+layout(location = 0) in vec2 st[3];
+layout(location = 1) in vec3 stp[3];
+layout(location = 2) in vec4 fragment_normal[3];
+layout(location = 3) in vec4 fragment_color[3];
+layout(location = 4) in vec4 fragment_position[3];
 
-layout(location = 0) out vec2 st;
-layout(location = 1) out vec3 stp;
-layout(location = 2) out vec4 fragment_normal;
-layout(location = 3) out vec4 fragment_color;
-layout(location = 4) out vec4 fragment_position;
+layout(location = 0) out vec2 st_out;
+layout(location = 1) out vec3 stp_out;
+layout(location = 2) out vec4 fragment_normal_out;
+layout(location = 3) out vec4 fragment_color_out;
+layout(location = 4) out vec4 fragment_position_out;
 
 void main()
 {
-
-	st = vertex_tex;
-	stp = vertex_position;
-	fragment_normal = normalize(ModelTransform * vec4(vertex_normal,1));
-	fragment_color = vertex_color;
-	fragment_position = ModelTransform * vec4(vertex_position,1);
-
-	gl_Position =  Projection * fragment_position;
-
+  for(int i = 0; i < gl_in.length(); i++)
+  {
+  	gl_Position = gl_in[i].gl_Position;
+  	st_out = st[i];
+  	stp_out = stp[i];
+  	fragment_normal_out = fragment_normal[i];
+  	fragment_color_out = fragment_color[i];
+  	fragment_position_out = fragment_position[i];
+    EmitVertex();
+  }
+  EndPrimitive();
 }

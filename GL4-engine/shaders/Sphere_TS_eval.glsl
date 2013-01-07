@@ -9,32 +9,50 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 #version 430
 
+layout(triangles, equal_spacing, cw) in;
+
 layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
+layout(location = 3) uniform sampler2D teximage;
+layout(location = 4) uniform sampler2D heightimage;
+layout(location = 5) uniform float TessLevelInner;
+layout(location = 6) uniform float TessLevelOuter;
 
-layout(location = 0) in vec3 vertex_position;
-layout(location = 1) in vec2 vertex_tex;
-layout(location = 2) in vec3 vertex_normal;
-layout(location = 3) in vec4 vertex_color;
-layout(location = 4) in vec3 vertex_attribute3f;
-layout(location = 5) in float vertex_attribute1f;
+layout(location = 0) in vec3 tc_position[];
+layout(location = 1) in vec2 tc_tex[];
 
-layout(location = 0) out vec2 st;
-layout(location = 1) out vec3 stp;
-layout(location = 2) out vec4 fragment_normal;
-layout(location = 3) out vec4 fragment_color;
-layout(location = 4) out vec4 fragment_position;
+layout(location = 0) out vec3 te_position;
+layout(location = 1) out vec2 te_tex;
+layout(location = 2) out vec3 te_normal;
+//layout(location = 1) out vec3 tePatchDistance;
+
+
 
 void main()
 {
+    vec2 t0 = gl_TessCoord.x * tc_tex[0];
+    vec2 t1 = gl_TessCoord.y * tc_tex[1];
+    vec2 t2 = gl_TessCoord.z * tc_tex[2];
+    te_tex = t0 + t1 + t2;
 
-	st = vertex_tex;
-	stp = vertex_position;
-	fragment_normal = normalize(ModelTransform * vec4(vertex_normal,1));
-	fragment_color = vertex_color;
-	fragment_position = ModelTransform * vec4(vertex_position,1);
+    vec3 p0 = gl_TessCoord.x * tc_position[0];
+    vec3 p1 = gl_TessCoord.y * tc_position[1];
+    vec3 p2 = gl_TessCoord.z * tc_position[2];
 
-	gl_Position =  Projection * fragment_position;
+    float dist = 1.0+length(texture2D(heightimage, te_tex).xyz) / 4.0;
 
+/*
+    if(te_tex.x < 0.0 || te_tex.x > 1.0 || te_tex.y < 0.0 || te_tex.y > 1.0)
+        dist = 0.0;
+*/
+    //;
+    te_normal = normalize(p0 + p1 + p2);
+
+    te_position = (ModelTransform * vec4(normalize(p0 + p1 + p2)*dist,1)).xyz;
+
+    
+
+
+    gl_Position = Projection * vec4(te_position, 1);
 }

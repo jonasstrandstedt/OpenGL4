@@ -1,4 +1,35 @@
+/**
+Copyright (C) 2012-2014 Jonas Strandstedt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #include "Engine.h"
+
+/*
+ * loadTexture - load 8-bit texture data from a TGA file
+ * and set up the corresponding texture object.
+ */
+void gl4::Engine::loadTexture(const char *filename, GLuint texID) {
+  
+  GLFWimage img; // Use intermediate GLFWimage to get width and height
+
+  if(!glfwReadImage(filename, &img, GLFW_NO_RESCALE_BIT))
+  	std::cerr << "Failed to load texture from TGA file." << std::endl;
+  
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture( GL_TEXTURE_2D, texID );
+
+  glfwLoadTextureImage2D( &img, 0 );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+  glfwFreeImage(&img); // Clean up the malloc()'ed data pointer
+}
 
 gl4::Engine::Engine(int argc, char **argv) {
 	_doRender = true;
@@ -48,7 +79,7 @@ bool gl4::Engine::initGL() {
 
 	// check if window opened correctly
 	if( glfwGetWindowParam( GLFW_OPENED ) ) {
-
+		glEnable(GL_TEXTURE_2D); 
 		// init GLEW with experimental features
 		glewExperimental = GL_TRUE;
 		GLenum err = glewInit();
@@ -85,7 +116,7 @@ bool gl4::Engine::initGL() {
 		// init shaders
 		gl4::ShaderManager::getInstance();
 
-		// init FBO with same size as window with 32 samples/pixel
+		// init FBO with same size as window with 32 samples/pixel and 3 textures
 		_standard.init(_windowWidth, _windowHeight, 32,3);
 
 		// init fullscreen quad
@@ -102,11 +133,12 @@ bool gl4::Engine::initGL() {
 		{
 			glfwSetKeyCallback(_keyboardCallbackFunc);
 		}
-
 		return true;
-	} 
+	}
+
 	// if unable to open window, print error
 	std::cerr << "Could not open window" << std::endl;
+
 	return false;
 }
 
@@ -147,10 +179,11 @@ void gl4::Engine::render() {
 	while(_doRender) {
 
 		double t = glfwGetTime();
+		float dt = static_cast<float>(t - _t0);
 		// Handle all the updates
 		if (_updateFunc != 0)
 		{
-			_updateFunc(static_cast<float>(t - _t0));
+			_updateFunc(dt);
 		}
 		_t0 = t;
 
@@ -169,14 +202,14 @@ void gl4::Engine::render() {
 		_standard.unbind();
 
 		gl4::ShaderManager::getInstance()->bindShader("Deferred2");
-
 		// orthogonal projection
 		useOrthogonalProjection();
 
+		// set the camera poisition uniform
 		glUniform3f(2, 0,1,3);
+
 		// render the FBO texture
 		_standard.bindTextures(3);
-
 		_quad.render();
 
 		// unbind texture and shader
@@ -190,6 +223,12 @@ void gl4::Engine::render() {
 		if ( glfwGetKey( GLFW_KEY_ESC ) == GLFW_PRESS || !glfwGetWindowParam( GLFW_OPENED ) )
 			_stopRender();
 	}
+}
+
+
+bool gl4::Engine::isKeyPressed(int key)
+{
+	return glfwGetKey(key) == GLFW_PRESS;
 }
 
 void gl4::Engine::_stopRender() {

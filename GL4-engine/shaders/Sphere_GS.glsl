@@ -9,32 +9,49 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 #version 430
 
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
 layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 2) uniform vec3 CameraPosition;
+layout(location = 3) uniform sampler2D teximage;
+layout(location = 4) uniform sampler2D heightimage;
+layout(location = 5) uniform float TessLevelInner;
+layout(location = 6) uniform float TessLevelOuter;
 
-layout(location = 0) in vec3 vertex_position;
-layout(location = 1) in vec2 vertex_tex;
-layout(location = 2) in vec3 vertex_normal;
-layout(location = 3) in vec4 vertex_color;
-layout(location = 4) in vec3 vertex_attribute3f;
-layout(location = 5) in float vertex_attribute1f;
+layout(location = 0) in vec3 te_position[3];
+layout(location = 1) in vec2 te_tex[3];
+layout(location = 2) in vec3 te_normal[3];
 
-layout(location = 0) out vec2 st;
-layout(location = 1) out vec3 stp;
-layout(location = 2) out vec4 fragment_normal;
-layout(location = 3) out vec4 fragment_color;
-layout(location = 4) out vec4 fragment_position;
+layout(location = 0) out vec2 st_out;
+layout(location = 1) out vec3 stp_out;
+layout(location = 2) out vec3 fragment_normal_out;
+layout(location = 3) out vec3 distance_to_edge;
 
 void main()
 {
+    st_out = te_tex[0];
+    stp_out = te_position[0];
+    fragment_normal_out = normalize(te_normal[0]);
+    distance_to_edge = vec3(1, 0, 0);
+    gl_Position = gl_in[0].gl_Position; 
+    EmitVertex();
 
-	st = vertex_tex;
-	stp = vertex_position;
-	fragment_normal = normalize(ModelTransform * vec4(vertex_normal,1));
-	fragment_color = vertex_color;
-	fragment_position = ModelTransform * vec4(vertex_position,1);
+    st_out = te_tex[1];
+    stp_out = te_position[1];
+    fragment_normal_out = normalize(te_normal[1]);
+    distance_to_edge = vec3(0, 1, 0);
+    gl_Position = gl_in[1].gl_Position; 
+    EmitVertex();
 
-	gl_Position =  Projection * fragment_position;
+    st_out = te_tex[2];
+    stp_out = te_position[2];
+    fragment_normal_out = normalize(te_normal[2]);
+    distance_to_edge = vec3(0, 0, 1);
+    gl_Position = gl_in[2].gl_Position; 
+    EmitVertex();
 
+    EndPrimitive();
+    
 }

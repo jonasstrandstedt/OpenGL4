@@ -1,3 +1,12 @@
+/**
+Copyright (C) 2012-2014 Jonas Strandstedt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #include "ShaderManager.h"
 #include <iostream>
 #include <cstdio>
@@ -20,28 +29,53 @@ gl4::ShaderManager::ShaderManager()
 	_shaders.insert( 
 		std::pair<std::string,GLuint>(
 			"Passthrough", 
-			_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Passthrough.frag")
+			_createShader(
+				"GL4-engine/shaders/Passthrough.vert",
+				"GL4-engine/shaders/Passthrough.frag"
+			)
 		)
 	);
 
 	_shaders.insert( 
 		std::pair<std::string,GLuint>(
 			"Textured", 
-			_createShader("GL4-engine/shaders/Passthrough.vert","GL4-engine/shaders/Textured.frag")
+			_createShader(
+				"GL4-engine/shaders/Passthrough.vert",
+				"GL4-engine/shaders/Textured.frag"
+			)
 		)
 	);
 
 	_shaders.insert( 
 		std::pair<std::string,GLuint>(
 			"Deferred1", 
-			_createShader("GL4-engine/shaders/Deferred.vert","GL4-engine/shaders/Deferred1.frag")
+			_createShader(
+				"GL4-engine/shaders/Deferred.vert",
+				"GL4-engine/shaders/Deferred1.frag"
+			)
+		)
+	);
+
+	_shaders.insert( 
+		std::pair<std::string,GLuint>(
+			"Deferred1_sphere", 
+			_createShader(
+				"GL4-engine/shaders/Sphere_VS.glsl",
+				"GL4-engine/shaders/Sphere_FS.glsl",
+				"GL4-engine/shaders/Sphere_GS.glsl",
+				"GL4-engine/shaders/Sphere_TS_control.glsl",
+				"GL4-engine/shaders/Sphere_TS_eval.glsl"
+			)
 		)
 	);
 
 	_shaders.insert( 
 		std::pair<std::string,GLuint>(
 			"Deferred2", 
-			_createShader("GL4-engine/shaders/Deferred.vert","GL4-engine/shaders/Deferred2.frag")
+			_createShader(
+				"GL4-engine/shaders/Deferred.vert",
+				"GL4-engine/shaders/Deferred2.frag"
+			)
 		)
 	);
 
@@ -128,7 +162,7 @@ char* gl4::ShaderManager::_readShaderFile(const char *filename)
 	return buffer;
 }
 
-GLuint gl4::ShaderManager::_createShader(const char *vertfilename, const char *fragfilename) 
+GLuint gl4::ShaderManager::_createShader(const char *vertfilename, const char *fragfilename, const char *geofilename, const char *tesscontrolfilename, const char *tessevalfilename) 
 {
 	GLuint programObj;
 	GLuint fragmentShader;
@@ -172,10 +206,72 @@ GLuint gl4::ShaderManager::_createShader(const char *vertfilename, const char *f
 		std::cerr << "Fragment shader compile error: " << str << std::endl;
 	}
 
+
+
   // Create a program object and attach the compiled shaders
 	programObj = glCreateProgram();
 	glAttachShader( programObj, vertexShader );
 	glAttachShader( programObj, fragmentShader );
+
+	if (tesscontrolfilename != 0 && tessevalfilename != 0)
+	{
+		GLuint tessShader[2];
+		const char *tessShaderStrings[1];
+		GLint tessCompiled = GL_FALSE;
+		for (int i = 0; i < 2; ++i)
+		{
+			char *tessShaderAssembly;
+			if (i == 0)
+			{
+				tessShader[i] = glCreateShader( GL_TESS_CONTROL_SHADER );
+				tessShaderAssembly = _readShaderFile( tesscontrolfilename );
+			} else if (i == 1)
+			{
+				tessShader[i] = glCreateShader( GL_TESS_EVALUATION_SHADER );
+				tessShaderAssembly = _readShaderFile( tessevalfilename );
+			}
+			
+
+			tessShaderStrings[0] = tessShaderAssembly;
+			glShaderSource( tessShader[i] , 1, tessShaderStrings, NULL );
+			glCompileShader( tessShader[i]  );
+			free((void *)tessShaderAssembly);
+
+			glGetShaderiv( tessShader[i] , GL_COMPILE_STATUS, &tessCompiled );
+			if(tessCompiled == GL_FALSE)
+			{
+				glGetInfoLogARB( tessShader[i] , sizeof(str), NULL, str );
+				std::cerr << "Tesselation shader compile error: " << str << std::endl;
+			}
+
+			glAttachShader( programObj, tessShader[i]  );
+		}
+
+		
+	}
+
+	if (geofilename != 0)
+	{
+		GLuint geometryShader;
+		const char *geometryShaderStrings[1];
+		GLint geometryCompiled = GL_FALSE;
+
+		geometryShader = glCreateShader( GL_GEOMETRY_SHADER );
+		char *geometryShaderAssembly = _readShaderFile( geofilename );
+		geometryShaderStrings[0] = geometryShaderAssembly;
+		glShaderSource( geometryShader, 1, geometryShaderStrings, NULL );
+		glCompileShader( geometryShader );
+		free((void *)geometryShaderAssembly);
+
+		glGetShaderiv( geometryShader, GL_COMPILE_STATUS, &geometryCompiled );
+		if(geometryCompiled == GL_FALSE)
+		{
+			glGetInfoLogARB( geometryShader, sizeof(str), NULL, str );
+			std::cerr << "Geometry shader compile error: " << str << std::endl;
+		}
+
+		glAttachShader( programObj, geometryShader );
+	}
 
   // Link the program object and print out the info log
 	glLinkProgram( programObj );
