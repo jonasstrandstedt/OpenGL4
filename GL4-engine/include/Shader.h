@@ -7,56 +7,58 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef VBO_H
-#define VBO_H
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
+enum {
+	UNIFORM_PROJECTION = 0,
+	UNIFORM_MODELTRANSFORM,
+	UNIFORM_TEXTURE1,
+	UNIFORM_TEXTURE2,
+	UNIFORM_TEXTURE3,
+	UNIFORM_TESSLEVEL,
+	UNIFORM_WIREFRAME,
+	UNIFORM_LIGHTSOURCE,
+	UNIFORM_USETEXTURE
+};
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-typedef struct
-{
-	GLfloat location[3];
-	GLfloat tex[2];
-	GLfloat normal[3];
-	GLfloat color[4];
-	GLfloat attribute[3];
-	GLfloat float_attribute;
-	//GLubyte padding[4]; // Pads the struct out to 64 bytes for performance increase
-} Vertex;
 
 namespace gl4
 {
-	class VBO 
+	class Shader
 	{
 	public:
+
+
 		//initializers
-		VBO();
-		~VBO();
+		Shader();
+		Shader(const char *vertfilename, const char *fragfilename, const char *geofilename = 0, const char *tesscontrolfilename = 0, const char *tessevalfilename = 0);
+		~Shader();
 
-		// init VBO
-		virtual void init();
-		void setProportions(float w, float h) { _w = w; _h = h;};
+		void init();
+		void link();
 
-		// render
-		void render();
+		bool attachVertexShader(const char *filename);
+		bool attachFragmentShader(const char *filename);
+		bool attachGeometryShader(const char *filename);
+		bool attachTessellationShader(const char *controlFilename, const char *evalFilename);
+
+		GLuint getShaderProgram() { return _shaderProgram; };
+
+		GLint getUniformLocation(int uniform);
+
+
 	private:
 
-		GLuint _vaoID;
-		GLuint _vBufferID;
-		GLuint _iBufferID;
-		float _w;
-		float _h;
+		GLuint _shaderProgram;
 
-	protected:
-		// arrays with all triangles and indices
-		GLenum _mode;
-		unsigned int _isize;
-		unsigned int _vsize;
-		Vertex *_varray;
-		int *_iarray;
+		GLint _uniformLocations[16];
+
+		GLuint _compileShader(GLenum shaderType, const char *filename, const char *shaderString);
+		char* _readShaderFile(const char *filename);
 	};
 }
 

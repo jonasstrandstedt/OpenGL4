@@ -20,11 +20,14 @@ MESSAGE =
 #specify dependency list for all .cpp files
 OBJECTS ?= main.o 
 OBJECTS += GL4-engine/src/Engine.o
+OBJECTS += GL4-engine/src/DeferredRender.o
 OBJECTS += GL4-engine/src/VBO.o
 OBJECTS += GL4-engine/src/FBO.o
 OBJECTS += GL4-engine/src/ShaderManager.o
+OBJECTS += GL4-engine/src/Shader.o
 OBJECTS += GL4-engine/src/TextureManager.o
 OBJECTS += GL4-engine/src/Sphere.o
+OBJECTS += GL4-engine/src/Geometry.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
 OUTPUT ?= Program
@@ -33,7 +36,7 @@ ifeq ($(OS),MinGW)
 endif
 
 # Compiler flags to the linker
-FLAGS ?=
+FLAGS ?= -lpng
 
 # Compiler flags for all objects
 CXXFLAGS ?= 
@@ -44,22 +47,14 @@ INCPATH ?= -isystem"GL4-engine/include"
 # Specify what needs to be includes, OPENGL is given (but kept as option)
 OPENGL=1
 
-# uncomment or run "make SOUND=1", removes the _NOSOUND_ define.
-#SOUND=1
-
-# uncomment or run "make TEST=1", compiles gtest and adds the _TEST_ define
-#TEST=1
-
-# uncomment or run "make RELEASE=1", only if TEST is not defined, adds the -O3 optimization flag
-#RELEASE=1
-
 # check if argument OPENGL=1 is set, reguires glfw to be properly installed
 ifdef OPENGL
 	MESSAGE += OpenGL,
 	ifeq ($(OS),Linux)
 		FLAGS += -lglfw -lGL -lGLU -lGLEW
 	else ifeq ($(OS),Darwin)
-		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW
+		INCPATH += -isystem"/usr/X11/include"
+		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
 	else ifeq ($(OS),MinGW)
 		FLAGS += -lglfw 
 	endif

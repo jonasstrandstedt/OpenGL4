@@ -7,56 +7,55 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef VBO_H
-#define VBO_H
+#ifndef DEFERREDRENDER_H
+#define DEFERREDRENDER_H
 
+// GL related libraries
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
+// glm
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#include "FBO.h"
+#include "VBO.h"
 
-typedef struct
-{
-	GLfloat location[3];
-	GLfloat tex[2];
-	GLfloat normal[3];
-	GLfloat color[4];
-	GLfloat attribute[3];
-	GLfloat float_attribute;
-	//GLubyte padding[4]; // Pads the struct out to 64 bytes for performance increase
-} Vertex;
+enum {
+	DEFERRED_WIREFRAME = 0,
+	DEFERRED_LIGHTSOURCE,
+	DEFERRED_TEXTURE,
+};
 
 namespace gl4
 {
-	class VBO 
+	class DeferredRender
 	{
-	public:
-		//initializers
-		VBO();
-		~VBO();
+		public:
+			DeferredRender();
+			~DeferredRender();
 
-		// init VBO
-		virtual void init();
-		void setProportions(float w, float h) { _w = w; _h = h;};
+			void init(unsigned int windowWidth, unsigned int windowHeight);
+			void enable(int state);
+			void disable(int state);
+			void useState(int uniform, bool state);
+			void render(void (*f)(void));
 
-		// render
-		void render();
-	private:
+		private:
+			//
+			unsigned int _windowWidth;
+			unsigned int _windowHeight;
+			glm::mat4 _orthogonalProjectionMatrix;
 
-		GLuint _vaoID;
-		GLuint _vBufferID;
-		GLuint _iBufferID;
-		float _w;
-		float _h;
+			// if's
+			bool _wireframe;
+			bool _lightsource;
 
-	protected:
-		// arrays with all triangles and indices
-		GLenum _mode;
-		unsigned int _isize;
-		unsigned int _vsize;
-		Vertex *_varray;
-		int *_iarray;
+			// FBOs
+			FBO _standard;
+			VBO _quad;
+
 	};
 }
 

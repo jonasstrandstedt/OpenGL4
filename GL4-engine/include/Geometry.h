@@ -7,56 +7,28 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef VBO_H
-#define VBO_H
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
 
-#include <GL/glew.h>
-#include <GL/glfw.h>
-
-
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-typedef struct
-{
-	GLfloat location[3];
-	GLfloat tex[2];
-	GLfloat normal[3];
-	GLfloat color[4];
-	GLfloat attribute[3];
-	GLfloat float_attribute;
-	//GLubyte padding[4]; // Pads the struct out to 64 bytes for performance increase
-} Vertex;
+#include "Engine.h"
 
 namespace gl4
 {
-	class VBO 
+	class Geometry : public VBO
 	{
 	public:
 		//initializers
-		VBO();
-		~VBO();
+		Geometry();
+		~Geometry();
 
-		// init VBO
 		virtual void init();
-		void setProportions(float w, float h) { _w = w; _h = h;};
+		glm::mat4 getTransform();
 
-		// render
-		void render();
 	private:
-
-		GLuint _vaoID;
-		GLuint _vBufferID;
-		GLuint _iBufferID;
-		float _w;
-		float _h;
-
+		glm::vec2 _limits[3];
+		glm::vec3 _position;
+		glm::mat4 _rotation;
 	protected:
-		// arrays with all triangles and indices
-		GLenum _mode;
-		unsigned int _isize;
-		unsigned int _vsize;
-		Vertex *_varray;
-		int *_iarray;
 	};
 }
 

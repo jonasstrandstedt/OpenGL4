@@ -28,6 +28,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // GL4-Engine related classes
 #include "FBO.h"
 #include "VBO.h"
+#include "DeferredRender.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
 
@@ -48,6 +49,7 @@ namespace gl4
 		public:
 			Engine(int argc, char **argv);
 			~Engine();
+			DeferredRender* getDeferredRender() {return &_deferredRender; };
 
 			bool initGL();
 			void render();
@@ -56,6 +58,7 @@ namespace gl4
 			void setKeyBoardCallbackfunc(void (*f)(int, int));
 			void setUpdateFunc(void (*f)(float));
 			void setRenderFunc(void (*f)(void));
+			void setDeferredRenderFunc(void (*f)(void));
 			void setInitFunc(void (*f)(void));
 
 			// other set functions
@@ -70,12 +73,11 @@ namespace gl4
 
 
 		private:
-			void loadTexture(const char *filename, GLuint texID);
-
 			// user defined functions
 			void (*_keyboardCallbackFunc)(int, int);
 			void (*_updateFunc)(float);
 			void (*_renderFunc)(void);
+			void (*_deferredRenderFunc)(void);
 			void (*_initFunc)(void);
 
 			//variables setting the speed
@@ -88,10 +90,11 @@ namespace gl4
 			unsigned int _windowWidth;
 			unsigned int _windowHeight;
 
+			// Fixed pipeline render target
+			DeferredRender _deferredRender;
 			// FBOs
 			FBO _standard;
 			VBO _quad;
-			GLuint textureID;
 
 			// private functions
 			void _stopRender();

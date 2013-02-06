@@ -29,13 +29,14 @@ layout(location = 2) out vec4 normal;
 void main()
 {
 
-	//float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
-	//if(dist < 0.01) {
-	//	diffuse = vec4(1,1,1,1);
-	//} else {
-		diffuse = texture2D(teximage, st);
+	float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
+	if(dist < 0.01) {
+		diffuse = vec4(1,1,1,1);
+	} else {
+		//diffuse = texture2D(teximage, st);
 		//diffuse = vec4(1,0,0,1);
-	//}
+		discard;
+	}
 
 	position = vec4(stp,1);
 	normal = vec4(fragment_normal,1);

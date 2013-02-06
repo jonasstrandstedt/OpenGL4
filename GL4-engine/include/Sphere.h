@@ -10,15 +10,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "Engine.h"
+#include "Geometry.h"
 
 namespace gl4
 {
-	class Sphere: public VBO
+	class Sphere: public Geometry
 	{
 	public:
 		//initializers
-		Sphere(float radius = 1.0f, int segments = 8, bool tessellation = true);
+		Sphere(float radius = 1.0f, int segments = 8, bool tessellation = false);
 		~Sphere();
 
 	private:

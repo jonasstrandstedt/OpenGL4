@@ -7,57 +7,15 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef VBO_H
-#define VBO_H
-
-#include <GL/glew.h>
-#include <GL/glfw.h>
+#include "WavefrontObject.h"
 
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-typedef struct
+gl4::WavefrontObject::WavefrontObject(const char *filename)
 {
-	GLfloat location[3];
-	GLfloat tex[2];
-	GLfloat normal[3];
-	GLfloat color[4];
-	GLfloat attribute[3];
-	GLfloat float_attribute;
-	//GLubyte padding[4]; // Pads the struct out to 64 bytes for performance increase
-} Vertex;
 
-namespace gl4
-{
-	class VBO 
-	{
-	public:
-		//initializers
-		VBO();
-		~VBO();
-
-		// init VBO
-		virtual void init();
-		void setProportions(float w, float h) { _w = w; _h = h;};
-
-		// render
-		void render();
-	private:
-
-		GLuint _vaoID;
-		GLuint _vBufferID;
-		GLuint _iBufferID;
-		float _w;
-		float _h;
-
-	protected:
-		// arrays with all triangles and indices
-		GLenum _mode;
-		unsigned int _isize;
-		unsigned int _vsize;
-		Vertex *_varray;
-		int *_iarray;
-	};
 }
 
-#endif
+gl4::WavefrontObject::~WavefrontObject()
+{
+
+}

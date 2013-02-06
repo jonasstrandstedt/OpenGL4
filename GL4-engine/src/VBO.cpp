@@ -21,6 +21,8 @@ gl4::VBO::VBO()
 	_varray = NULL;
 	_iarray = NULL;
 	_mode = GL_POINTS;
+	_w = 1.0f;
+	_h = 1.0f;
 }
 gl4::VBO::~VBO() 
 {
@@ -28,8 +30,11 @@ gl4::VBO::~VBO()
 	free(_iarray);
 }
 
-void gl4::VBO::init(float w, float h) 
+void gl4::VBO::init() 
 {
+	std::cout << "VBO Init()" << std::endl;
+
+	// if arrays not set from sub-class initialize with a colored quad
 	if(_vsize == 0 || _isize == 0 || _varray == NULL || _iarray == NULL) {
 
 		std::cout << "VBO: Init color quad" << std::endl;
@@ -43,14 +48,14 @@ void gl4::VBO::init(float w, float h)
 		_varray[0].location[0] = 0.0f;
 		_varray[0].location[1] = 0.0f;
 		_varray[0].location[2] = 0.0f;
-		_varray[1].location[0] = w;
+		_varray[1].location[0] = _w;
 		_varray[1].location[1] = 0.0f;
 		_varray[1].location[2] = 0.0f;
 		_varray[2].location[0] = 0.0f;
-		_varray[2].location[1] = h;
+		_varray[2].location[1] = _h;
 		_varray[2].location[2] = 0.0f;
-		_varray[3].location[0] = w;
-		_varray[3].location[1] = h;
+		_varray[3].location[0] = _w;
+		_varray[3].location[1] = _h;
 		_varray[3].location[2] = 0.0f;
 
 		_varray[0].tex[0] = 0.0f;
@@ -80,15 +85,22 @@ void gl4::VBO::init(float w, float h)
 			_varray[i].attribute[2] = 0.0f;
 			_varray[i].float_attribute = 0.0f;
 		}
+		// red
 		_varray[0].color[0] = 1.0f;
 		_varray[0].color[1] = 0.0f;
 		_varray[0].color[2] = 0.0f;
+
+		// green
 		_varray[1].color[0] = 0.0f;
 		_varray[1].color[1] = 1.0f;
 		_varray[1].color[2] = 0.0f;
+
+		// blue
 		_varray[2].color[0] = 0.0f;
 		_varray[2].color[1] = 0.0f;
 		_varray[2].color[2] = 1.0f;
+
+		// white
 		_varray[3].color[0] = 1.0f;
 		_varray[3].color[1] = 1.0f;
 		_varray[3].color[2] = 1.0f;
@@ -98,7 +110,7 @@ void gl4::VBO::init(float w, float h)
 	GLuint errorID = glGetError();
 	glGenVertexArrays(1, &_vaoID);
 
-		// First VAO setup
+	// First VAO setup
 	glBindVertexArray(_vaoID);
 
 	glGenBuffers(1, &_vBufferID);

@@ -11,8 +11,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define SHADERMANAGER_H
 
 #include "Engine.h"
+#include "Shader.h"
 #include <string>
 #include <map>
+#include <vector>
+
+#define UNIFORM_LOCATION(i) gl4::ShaderManager::getInstance()->getActiveShaderUniform(i)
 
 namespace gl4
 {
@@ -24,20 +28,24 @@ namespace gl4
 		~ShaderManager();
 		static ShaderManager* getInstance();
 
+		void addShaderProgram(std::string name, Shader *program);
 		GLuint getShaderProgram(unsigned int i);
 		void bindShader(unsigned int i);
 		GLuint getShaderProgram(std::string shader);
 		void bindShader(std::string shader);
 		void unbindShader();
 
+		GLint getActiveShaderUniform(int uniform);
+
 	private:
+		
+		// singleton constructor
 		ShaderManager();
 		static ShaderManager* _instance;
 
-		std::map< std::string, GLuint > _shaders;
 
-		char* _readShaderFile(const char *filename);
-		GLuint _createShader(const char *vertfilename, const char *fragfilename, const char *geofilename = 0, const char *tesscontrolfilename = 0, const char *tessevalfilename = 0);
+		Shader *_activeShader;
+		std::map< std::string, Shader* > _shaders;
 	};
 }
 

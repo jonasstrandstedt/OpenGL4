@@ -14,32 +14,39 @@ layout(location = 1) uniform mat4 ModelTransform;
 layout(location = 3) uniform sampler2D texture1;
 layout(location = 4) uniform sampler2D texture2;
 layout(location = 5) uniform sampler2D texture3;
+layout(location = 6) uniform float TessLevel;
+layout(location = 7) uniform bool Wireframe;
+layout(location = 8) uniform bool Lightsource;
+layout(location = 9) uniform bool UseTexture;
 
 layout(location = 0) in vec2 st;
 layout(location = 1) in vec3 stp;
 layout(location = 2) in vec4 fragment_normal;
 layout(location = 3) in vec4 fragment_color;
+layout(location = 4) in vec4 fragment_position;
+layout(location = 5) in vec3 distance_to_edge;
 
-layout(location = 0) out vec4 finalColor;
+layout(location = 0) out vec4 diffuse;
+layout(location = 1) out vec4 position;
+layout(location = 2) out vec4 normal;
 
 void main()
 {
-	vec4 diffuse = texture2D(texture1, st);
-	vec4 position = texture2D(texture2, st);
-	vec4 normal = texture2D(texture3, st);
+	if(UseTexture)
+	{
+		diffuse = texture2D(texture1, st);
+	} else {
+		diffuse = fragment_color;
+	}
 
-	vec3 light = vec3(50,100,50);
-	vec3 lightDir = light - position.xyz ;
+	if(Wireframe) 
+	{
+		float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
+		if(dist < 0.01) {
+			diffuse = vec4(1,1,1,1);
+		}
+	}
 
-	normal = normalize(normal);
-	lightDir = normalize(lightDir);
-/*
-	vec3 eyeDir = normalize(CameraPosition-position.xyz);
-	vec3 vHalfVector = normalize(lightDir.xyz+eyeDir);
-
-	vec3 v1 =  max(dot(normal.xyz,lightDir),0) * diffuse.xyz;
-	float f = pow(max(dot(normal.xyz,vHalfVector),0.0), 100) * 1.5;
-	finalColor = vec4(v1+f,1);
-	*/
-	finalColor = diffuse;
+	position = fragment_position;
+	normal = fragment_normal;
 }

@@ -13,12 +13,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 gl4::VBO *obj;
 gl4::Sphere *sphere;
 gl4::Engine *engine;
+gl4::DeferredRender *deferredEngine;
 glm::vec2 angle;
 
 int tess;
 
 void keyboardCallback(int key, int state);
 void myRenderFunc(void);
+void myDeferredRenderFunc(void);
 void myInitFunc(void);
 void myUpdateFunc(float dt);
 
@@ -31,6 +33,7 @@ int main(int argc, char **argv) {
 	engine->setKeyBoardCallbackfunc(keyboardCallback);
 	engine->setUpdateFunc(myUpdateFunc);
 	engine->setRenderFunc(myRenderFunc);
+	engine->setDeferredRenderFunc(myDeferredRenderFunc);
 	engine->setInitFunc(myInitFunc);
 	
 	// init
@@ -81,10 +84,13 @@ void myInitFunc(void)
 	// load textures
 	gl4::TextureManager::getInstance()->loadTexture("earth_diffuse", "data/earth_nasa_lowres.tga");
 	gl4::TextureManager::getInstance()->loadTexture("earth_displacement", "data/earth_nasa_topography_lowres.tga");
+
+	deferredEngine = engine->getDeferredRender();
 }
 
 void myRenderFunc(void) 
 {
+	/*
 	// draw a colored plane
 	gl4::ShaderManager::getInstance()->bindShader("Passthrough");
 	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
@@ -93,7 +99,8 @@ void myRenderFunc(void)
 	engine->usePerspectiveProjection(plane_transform);
 	obj->render();
 	gl4::ShaderManager::getInstance()->unbindShader();
-
+	*/
+/*
 
 	// draw the earth
 	gl4::ShaderManager::getInstance()->bindShader("Deferred1_sphere");
@@ -121,12 +128,45 @@ void myRenderFunc(void)
 	// unbind
 	glBindTexture(GL_TEXTURE_2D, 0);
 	gl4::ShaderManager::getInstance()->unbindShader();
+	*/	
+}
+
+void myDeferredRenderFunc(void) 
+{
+	
+	// draw a colored plane
+	deferredEngine->useState(DEFERRED_WIREFRAME, true);
+
+	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
+	plane_transform = glm::translate(plane_transform,glm::vec3(-0.5,-0.3, 0.0));
+	plane_transform = glm::rotate(plane_transform,-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+
+	engine->usePerspectiveProjection(plane_transform);
+	obj->render();
+
+	deferredEngine->useState(DEFERRED_WIREFRAME, false);
+	deferredEngine->useState(DEFERRED_TEXTURE, true);
+
+	// bind earth texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gl4::TextureManager::getInstance()->getTexture("earth_diffuse"));
+	glUniform1i(gl4::ShaderManager::getInstance()->getActiveShaderUniform(UNIFORM_TEXTURE1), 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D,  gl4::TextureManager::getInstance()->getTexture("earth_displacement"));
+	glUniform1i(gl4::ShaderManager::getInstance()->getActiveShaderUniform(UNIFORM_TEXTURE2), 1);
+
+	// rotate around the x-axis and y-axis
+	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
+	transform = glm::rotate(transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
+	engine->usePerspectiveProjection(transform);
+
+	// set tessellation levels
+	sphere->render();
 	
 }
 
 void myUpdateFunc(float dt)
 {
-	//angle[1] += dt*10;
 
 	float speed = 50.0f;
 	if(engine->isKeyPressed(GLFW_KEY_RIGHT)) {

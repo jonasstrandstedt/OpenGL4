@@ -26,59 +26,40 @@ gl4::ShaderManager::ShaderManager()
 {
 	std::cout << "Initializing ShaderManager" << std::endl;
 
-	_shaders.insert( 
-		std::pair<std::string,GLuint>(
-			"Passthrough", 
-			_createShader(
-				"GL4-engine/shaders/Passthrough.vert",
-				"GL4-engine/shaders/Passthrough.frag"
-			)
-		)
-	);
+	// set the active shader to none
+	_activeShader = 0;
+/*
+	Shader *s1 = new Shader();
+	s1->init();
+	s1->attachVertexShader("GL4-engine/shaders/Passthrough.vert");
+	s1->attachFragmentShader("GL4-engine/shaders/Passthrough.frag");
+	s1->link();
+	
+	Shader *s2 = new Shader("GL4-engine/shaders/Passthrough.vert", "GL4-engine/shaders/Textured.frag");
+*/
+	Shader *s3 = new Shader(	"GL4-engine/shaders/Deferred1_VS.glsl", 
+								"GL4-engine/shaders/Deferred1_FS.glsl", 
+								"GL4-engine/shaders/Deferred1_GS.glsl"
+							);
+	/*, 
+								"GL4-engine/shaders/Deferred1_TS_control.glsl", 
+								"GL4-engine/shaders/Deferred1_TS_eval.glsl"
+								*/
+/*
+	Shader *s4 = new Shader(	"GL4-engine/shaders/Sphere_VS.glsl", 
+								"GL4-engine/shaders/Sphere_FS.glsl", 
+								"GL4-engine/shaders/Sphere_GS.glsl", 
+								"GL4-engine/shaders/Sphere_TS_control.glsl", 
+								"GL4-engine/shaders/Sphere_TS_eval.glsl"
+							);
+*/
+	Shader *s5 = new Shader("GL4-engine/shaders/Deferred.vert", "GL4-engine/shaders/Deferred2.frag");
 
-	_shaders.insert( 
-		std::pair<std::string,GLuint>(
-			"Textured", 
-			_createShader(
-				"GL4-engine/shaders/Passthrough.vert",
-				"GL4-engine/shaders/Textured.frag"
-			)
-		)
-	);
-
-	_shaders.insert( 
-		std::pair<std::string,GLuint>(
-			"Deferred1", 
-			_createShader(
-				"GL4-engine/shaders/Deferred.vert",
-				"GL4-engine/shaders/Deferred1.frag"
-			)
-		)
-	);
-
-	_shaders.insert( 
-		std::pair<std::string,GLuint>(
-			"Deferred1_sphere", 
-			_createShader(
-				"GL4-engine/shaders/Sphere_VS.glsl",
-				"GL4-engine/shaders/Sphere_FS.glsl",
-				"GL4-engine/shaders/Sphere_GS.glsl",
-				"GL4-engine/shaders/Sphere_TS_control.glsl",
-				"GL4-engine/shaders/Sphere_TS_eval.glsl"
-			)
-		)
-	);
-
-	_shaders.insert( 
-		std::pair<std::string,GLuint>(
-			"Deferred2", 
-			_createShader(
-				"GL4-engine/shaders/Deferred.vert",
-				"GL4-engine/shaders/Deferred2.frag"
-			)
-		)
-	);
-
+	//addShaderProgram("Passthrough", s1);
+	//addShaderProgram("Textured", s2);
+	addShaderProgram("Deferred1", s3);
+	//addShaderProgram("Deferred1_sphere", s4);
+	addShaderProgram("Deferred2", s5);
 }
 
 gl4::ShaderManager::~ShaderManager()
@@ -86,229 +67,51 @@ gl4::ShaderManager::~ShaderManager()
 
 }
 
+void gl4::ShaderManager::addShaderProgram(std::string name, Shader *program)
+{
+	
+	_shaders.insert(std::pair<std::string,Shader*>(name,program));
+}
+
 
 GLuint gl4::ShaderManager::getShaderProgram(std::string shader)
 {
-	std::map< std::string,GLuint >::iterator it;
+	std::map< std::string,Shader* >::iterator it;
 	it = _shaders.find(shader);
 	if (it != _shaders.end())
 	{
-		return (*it).second;
+		return (*it).second->getShaderProgram();
 	} else {
 		return 0;
 	}
 }
+
 void gl4::ShaderManager::bindShader(std::string shader)
 {
-	std::map< std::string,GLuint >::iterator it;
+	std::map< std::string,Shader* >::iterator it;
 	it = _shaders.find(shader);
 	if (it != _shaders.end())
 	{
-		glUseProgram( (*it).second);
+		//std::cout << "Binding shader [" << shader << "]" << std::endl;
+		_activeShader = (*it).second;
+		glUseProgram( _activeShader->getShaderProgram());
 	} else {
+		_activeShader = 0;
 		glUseProgram(0);
 	}
 }
-GLuint gl4::ShaderManager::getShaderProgram(unsigned int i)
-{
-	if (i < _shaders.size())
-	{
-		std::map< std::string,GLuint >::iterator it = _shaders.begin();
-		for (int j = 0; j < i; ++j)
-		{
-			it++;
-		}
- 	 	return (*it).second;
-	}
- 	return 0;
-}
 
-void gl4::ShaderManager::bindShader(unsigned int i)
-{
-	if (i < _shaders.size())
-	{
-		std::map< std::string,GLuint >::iterator it = _shaders.begin();
-		for (int j = 0; j < i; ++j)
-		{
-			it++;
-		}
- 	 	glUseProgram( (*it).second );
-	} else {
-		glUseProgram( 0 );
-	}
- 	
-}
 void gl4::ShaderManager::unbindShader() 
 {
+	_activeShader = 0;
 	glUseProgram( 0 );
 }
 
-char* gl4::ShaderManager::_readShaderFile(const char *filename) 
+GLint gl4::ShaderManager::getActiveShaderUniform(int uniform)
 {
-	std::FILE *file = std::fopen(filename, "r");
-	if(file == NULL)
+	if (_activeShader == 0)
 	{
-		std::cerr << "I/O error: Cannot open shader file [" << filename << "]" << std::endl;
-		return 0;
+		return -1;
 	}
-	fseek(file, 0, SEEK_END);
-	int bytesinfile = (int)ftell(file);
-	fseek(file, 0, SEEK_SET);
-	char *buffer = (char*)std::malloc(bytesinfile+1);
-	int bytesread = std::fread( buffer, 1, bytesinfile, file);
-	buffer[bytesread] = 0; // Terminate the string with 0
-	std::fclose(file);
-
-	return buffer;
-}
-
-GLuint gl4::ShaderManager::_createShader(const char *vertfilename, const char *fragfilename, const char *geofilename, const char *tesscontrolfilename, const char *tessevalfilename) 
-{
-	GLuint programObj;
-	GLuint fragmentShader;
-	GLuint vertexShader;
-	const char *vertexShaderStrings[1];
-	GLint vertexCompiled = GL_FALSE;
-	const char *fragmentShaderStrings[1];
-	GLint fragmentCompiled = GL_FALSE;
-	GLint shadersLinked = GL_FALSE;
-	char str[4096]; // For error messages from the GLSL compiler and linker
-
-  // Create the vertex and fragment shaders
-	vertexShader = glCreateShader( GL_VERTEX_SHADER );
-
-	char *vertexShaderAssembly = _readShaderFile( vertfilename );
-	vertexShaderStrings[0] = vertexShaderAssembly;
-	glShaderSource( vertexShader, 1, vertexShaderStrings, NULL );
-	glCompileShader( vertexShader );
-	free((void *)vertexShaderAssembly);
-
-	glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &vertexCompiled );
-	if(vertexCompiled == GL_FALSE)
-	{
-		glGetInfoLogARB( vertexShader, sizeof(str), NULL, str );
-		std::cerr << "Vertex shader compile error: " << str << std::endl;
-	}
-
-	fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
-
-	char *fragmentShaderAssembly = _readShaderFile( fragfilename );
-	fragmentShaderStrings[0] = fragmentShaderAssembly;
-	glShaderSource( fragmentShader, 1, fragmentShaderStrings, NULL );
-	glCompileShader( fragmentShader );
-	free((void *)fragmentShaderAssembly);
-
-	glGetShaderiv( fragmentShader, GL_COMPILE_STATUS, 
-		&fragmentCompiled );
-	if(fragmentCompiled == GL_FALSE)
-	{
-		glGetInfoLogARB( fragmentShader, sizeof(str), NULL, str );
-		std::cerr << "Fragment shader compile error: " << str << std::endl;
-	}
-
-
-
-  // Create a program object and attach the compiled shaders
-	programObj = glCreateProgram();
-	glAttachShader( programObj, vertexShader );
-	glAttachShader( programObj, fragmentShader );
-
-	if (tesscontrolfilename != 0 && tessevalfilename != 0)
-	{
-		GLuint tessShader[2];
-		const char *tessShaderStrings[1];
-		GLint tessCompiled = GL_FALSE;
-		for (int i = 0; i < 2; ++i)
-		{
-			char *tessShaderAssembly;
-			if (i == 0)
-			{
-				tessShader[i] = glCreateShader( GL_TESS_CONTROL_SHADER );
-				tessShaderAssembly = _readShaderFile( tesscontrolfilename );
-			} else if (i == 1)
-			{
-				tessShader[i] = glCreateShader( GL_TESS_EVALUATION_SHADER );
-				tessShaderAssembly = _readShaderFile( tessevalfilename );
-			}
-			
-
-			tessShaderStrings[0] = tessShaderAssembly;
-			glShaderSource( tessShader[i] , 1, tessShaderStrings, NULL );
-			glCompileShader( tessShader[i]  );
-			free((void *)tessShaderAssembly);
-
-			glGetShaderiv( tessShader[i] , GL_COMPILE_STATUS, &tessCompiled );
-			if(tessCompiled == GL_FALSE)
-			{
-				glGetInfoLogARB( tessShader[i] , sizeof(str), NULL, str );
-				std::cerr << "Tesselation shader compile error: " << str << std::endl;
-			}
-
-			glAttachShader( programObj, tessShader[i]  );
-		}
-
-		
-	}
-
-	if (geofilename != 0)
-	{
-		GLuint geometryShader;
-		const char *geometryShaderStrings[1];
-		GLint geometryCompiled = GL_FALSE;
-
-		geometryShader = glCreateShader( GL_GEOMETRY_SHADER );
-		char *geometryShaderAssembly = _readShaderFile( geofilename );
-		geometryShaderStrings[0] = geometryShaderAssembly;
-		glShaderSource( geometryShader, 1, geometryShaderStrings, NULL );
-		glCompileShader( geometryShader );
-		free((void *)geometryShaderAssembly);
-
-		glGetShaderiv( geometryShader, GL_COMPILE_STATUS, &geometryCompiled );
-		if(geometryCompiled == GL_FALSE)
-		{
-			glGetInfoLogARB( geometryShader, sizeof(str), NULL, str );
-			std::cerr << "Geometry shader compile error: " << str << std::endl;
-		}
-
-		glAttachShader( programObj, geometryShader );
-	}
-
-  // Link the program object and print out the info log
-	glLinkProgram( programObj );
-	glGetProgramiv( programObj, GL_LINK_STATUS, &shadersLinked );
-
-	if( shadersLinked == GL_FALSE )
-	{
-		glGetInfoLogARB( programObj, sizeof(str), NULL, str );
-		std::cerr << "Program object linking error: " << str << std::endl;
-	}
-
-	std::cout << "Creating shader program [" << programObj << "]: " << std::endl;
-	std::cout << "   " << vertfilename << std::endl;
-	std::cout << "   " << fragfilename << std::endl;
-	
-
-	// for debugging
-	// std::cout << "Attribute positions (-1 if unused in shader): " << std::endl;
-	// glUseProgram( programObj );
-	// GLint pos_loc = glGetAttribLocation( programObj, "vertex_position");
-	// GLint tex_loc = glGetAttribLocation( programObj, "vertex_tex");
-	// GLint normal_loc = glGetAttribLocation( programObj, "vertex_normal");
-	// GLint color_loc = glGetAttribLocation( programObj, "vertex_color");
-	// GLint attrib3f_loc = glGetAttribLocation( programObj, "vertex_attribute3f");
-	// GLint attrib1f_loc = glGetAttribLocation( programObj, "vertex_attribute1f");
-	// GLint mvp_loc = glGetUniformLocation( programObj, "MVP");
-	// GLint teximage_loc = glGetUniformLocation( programObj, "teximage");
-	// std::cout << "   " << "vertex_position = " << pos_loc << std::endl;
-	// std::cout << "   " << "vertex_tex = " << tex_loc << std::endl;
-	// std::cout << "   " << "vertex_normal = " << normal_loc << std::endl;
-	// std::cout << "   " << "vertex_color = " << color_loc << std::endl;
-	// std::cout << "   " << "vertex_attribute3f = " << attrib3f_loc << std::endl;
-	// std::cout << "   " << "vertex_attributef = " << attrib1f_loc << std::endl;
-	// std::cout << "   " << "MVP = " << mvp_loc << std::endl;
-	// std::cout << "   " << "teximage = " << teximage_loc << std::endl;
-	// glUseProgram( 0 );
-
-
-	return programObj;
+	return  _activeShader->getUniformLocation(uniform);
 }

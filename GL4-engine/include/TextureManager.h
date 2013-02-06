@@ -29,10 +29,15 @@ namespace gl4
 		TextureManager();
 		static TextureManager* _instance;
 
+		// data
+		GLint _GL_MAX_TEXTURE_SIZE;
+		GLint _GL_MAX_TEXTURE_BUFFER_SIZE;
+
 		std::map< std::string, GLuint > _textures;
 
 		// private functions
 		bool _compare_extension(const char *filename, const char *extension);
+		GLuint _loadTextureFromPNG(const char * file_name, int * width = 0, int * height = 0);
 		GLuint _loadTextureFromTGA(const char *filename);
 	};
 }
