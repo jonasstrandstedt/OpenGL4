@@ -15,6 +15,7 @@ gl4::Sphere *sphere;
 gl4::Engine *engine;
 gl4::DeferredRender *deferredEngine;
 glm::vec2 angle;
+bool wireframe = true;
 
 int tess;
 
@@ -63,6 +64,11 @@ void keyboardCallback(int key, int state)
 	if(key == 'O' && state == GLFW_PRESS) {
 		if(tess > 1)
 			tess--;
+	}
+
+	// toggle wireframe
+	if(key == 'W' && state == GLFW_PRESS) {
+		wireframe = ! wireframe;
 	}
 }
 
@@ -135,7 +141,7 @@ void myDeferredRenderFunc(void)
 {
 	
 	// draw a colored plane
-	deferredEngine->useState(DEFERRED_WIREFRAME, true);
+	deferredEngine->useState(DEFERRED_WIREFRAME, wireframe);
 
 	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
 	plane_transform = glm::translate(plane_transform,glm::vec3(-0.5,-0.3, 0.0));
@@ -144,7 +150,6 @@ void myDeferredRenderFunc(void)
 	engine->usePerspectiveProjection(plane_transform);
 	obj->render();
 
-	deferredEngine->useState(DEFERRED_WIREFRAME, false);
 	deferredEngine->useState(DEFERRED_TEXTURE, true);
 
 	// bind earth texture
@@ -158,9 +163,8 @@ void myDeferredRenderFunc(void)
 	// rotate around the x-axis and y-axis
 	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
 	transform = glm::rotate(transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
+	
 	engine->usePerspectiveProjection(transform);
-
-	// set tessellation levels
 	sphere->render();
 	
 }

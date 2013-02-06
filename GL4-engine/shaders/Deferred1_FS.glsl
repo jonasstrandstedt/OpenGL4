@@ -39,10 +39,11 @@ void main()
 		diffuse = fragment_color;
 	}
 
+	// if wireframe is activated, the distance is calculated in pixels
 	if(Wireframe) 
 	{
 		float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
-		if(dist < 0.01) {
+		if(dist < 1.0) {
 			diffuse = vec4(1,1,1,1);
 		}
 	}

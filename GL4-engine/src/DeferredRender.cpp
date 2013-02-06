@@ -17,13 +17,6 @@ gl4::DeferredRender::DeferredRender()
 	_lightsource = false;
 	_windowWidth = 800;
 	_windowHeight = 600;
-
-	glm::mat4 Orthogonal = glm::ortho(0.0f,static_cast<float>(_windowWidth), 0.0f,static_cast<float>(_windowHeight), 0.1f, 100.0f);
-	glm::mat4 OrthogonalView = glm::lookAt(		glm::vec3(0,0,1), // Camera pos
-												glm::vec3(0,0,0), // and looks at the origin
-												glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
-																);
-	_orthogonalProjectionMatrix = Orthogonal * OrthogonalView;
 }
 
 gl4::DeferredRender::~DeferredRender() 
@@ -34,12 +27,22 @@ gl4::DeferredRender::~DeferredRender()
 
 void gl4::DeferredRender::init(unsigned int windowWidth, unsigned int windowHeight) 
 {
-	// init FBO with same size as window with 32 samples/pixel and 3 textures
-	_standard.init(windowWidth, windowHeight, 32, 3);
+	_windowWidth = windowWidth;
+	_windowHeight = windowHeight;
+
+	// init FBO with same size as window with 16 samples/pixel and 4 textures
+	_standard.init(_windowWidth, _windowHeight, 16, 4);
 
 	// init fullscreen quad
-	_quad.setProportions(windowWidth,windowHeight);
+	_quad.setProportions(_windowWidth,_windowHeight);
 	_quad.init();
+
+	glm::mat4 Orthogonal = glm::ortho(0.0f,static_cast<float>(_windowWidth), 0.0f,static_cast<float>(_windowHeight), 0.1f, 100.0f);
+	glm::mat4 OrthogonalView = glm::lookAt(		glm::vec3(0,0,1), // Camera pos
+												glm::vec3(0,0,0), // and looks at the origin
+												glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+																);
+	_orthogonalProjectionMatrix = Orthogonal * OrthogonalView;
 }
 
 void gl4::DeferredRender::enable(int state)
@@ -96,6 +99,7 @@ void gl4::DeferredRender::render(void (*renderFunc)(void))
 	glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), _wireframe);
 	glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), _lightsource);
 	glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), 0);
+	glUniform2f(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE), _windowWidth, _windowHeight);
 
 	renderFunc();
 

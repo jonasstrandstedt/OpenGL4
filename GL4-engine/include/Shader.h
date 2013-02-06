@@ -13,6 +13,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
+#include <ostream>
+
 enum {
 	UNIFORM_PROJECTION = 0,
 	UNIFORM_MODELTRANSFORM,
@@ -22,7 +24,8 @@ enum {
 	UNIFORM_TESSLEVEL,
 	UNIFORM_WIREFRAME,
 	UNIFORM_LIGHTSOURCE,
-	UNIFORM_USETEXTURE
+	UNIFORM_USETEXTURE,
+	UNIFORM_WINDOWSIZE
 };
 
 
@@ -49,9 +52,12 @@ namespace gl4
 		GLuint getShaderProgram() { return _shaderProgram; };
 
 		GLint getUniformLocation(int uniform);
+		void printUniforms(bool all = false);
 
 
 	private:
+
+		void _printUniform(std::ostream &out, const char *name, int uniform, bool set = false);
 
 		GLuint _shaderProgram;
 

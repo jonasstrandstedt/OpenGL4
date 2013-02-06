@@ -21,6 +21,7 @@ layout(location = 6) uniform float TessLevel;
 layout(location = 7) uniform bool Wireframe;
 layout(location = 8) uniform bool Lightsource;
 layout(location = 9) uniform bool UseTexture;
+layout(location = 10) uniform vec2 WindowSize;
 
 layout(location = 0) in vec2 in_st[3];
 layout(location = 1) in vec3 in_stp[3];
@@ -41,21 +42,32 @@ layout(location = 5) out vec3 out_distance_to_edge;
 
 void main()
 {
+    // taken from 'Single-Pass Wireframe Rendering'
+    vec2 p0 = WindowSize * gl_in[0].gl_Position.xy/gl_in[0].gl_Position.w;
+    vec2 p1 = WindowSize * gl_in[1].gl_Position.xy/gl_in[1].gl_Position.w;
+    vec2 p2 = WindowSize * gl_in[2].gl_Position.xy/gl_in[2].gl_Position.w;
+    vec2 v0 = p2-p1;
+    vec2 v1 = p2-p0;
+    vec2 v2 = p1-p0;
+    float area = abs(v1.x*v2.y - v1.y * v2.x);
+
     out_st = in_st[0];
     out_stp = in_stp[0];
     out_fragment_normal = normalize(in_fragment_normal[0]);
     out_fragment_color = in_fragment_color[0];
     out_fragment_position = in_fragment_position[0];
     out_distance_to_edge = vec3(1, 0, 0);
+    out_distance_to_edge = vec3(area/length(v0),0,0);
     gl_Position = gl_in[0].gl_Position; 
     EmitVertex();
-
+    
     out_st = in_st[1];
     out_stp = in_stp[1];
     out_fragment_normal = normalize(in_fragment_normal[1]);
     out_fragment_color = in_fragment_color[1];
     out_fragment_position = in_fragment_position[1];
     out_distance_to_edge = vec3(0, 1, 0);
+    out_distance_to_edge = vec3(0,area/length(v1),0);
     gl_Position = gl_in[1].gl_Position; 
     EmitVertex();
 
@@ -65,6 +77,7 @@ void main()
     out_fragment_color = in_fragment_color[2];
     out_fragment_position = in_fragment_position[2];
     out_distance_to_edge = vec3(0, 0, 1);
+    out_distance_to_edge = vec3(0,0,area/length(v2));
     gl_Position = gl_in[2].gl_Position; 
     EmitVertex();
 

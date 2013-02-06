@@ -39,8 +39,8 @@ void main()
 	stp = vertex_position;
 	fragment_normal = normalize(ModelTransform * vec4(vertex_normal,1));
 	fragment_color = vertex_color;
-	fragment_position = Projection * ModelTransform * vec4(vertex_position,1);
+	fragment_position = ModelTransform * vec4(vertex_position,1);
 
-	gl_Position =  fragment_position;
+	gl_Position =  Projection* fragment_position;
 
 }

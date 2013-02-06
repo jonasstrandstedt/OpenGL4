@@ -78,24 +78,40 @@ void gl4::Shader::link()
 		_uniformLocations[UNIFORM_WIREFRAME] = glGetUniformLocation( _shaderProgram, "Wireframe");
 		_uniformLocations[UNIFORM_LIGHTSOURCE] = glGetUniformLocation( _shaderProgram, "Lightsource");
 		_uniformLocations[UNIFORM_USETEXTURE] = glGetUniformLocation( _shaderProgram, "UseTexture");
+		_uniformLocations[UNIFORM_WINDOWSIZE] = glGetUniformLocation( _shaderProgram, "WindowSize");
 
 
-		std::cout << "Creating shader program [" << _shaderProgram << "]: " << std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_PROJECTION: " << _uniformLocations[UNIFORM_PROJECTION] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_MODELTRANSFORM: " << _uniformLocations[UNIFORM_MODELTRANSFORM] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_TEXTURE1: " << _uniformLocations[UNIFORM_TEXTURE1] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_TEXTURE2: " << _uniformLocations[UNIFORM_TEXTURE2] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_TEXTURE3: " << _uniformLocations[UNIFORM_TEXTURE3] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_TESSLEVEL: " << _uniformLocations[UNIFORM_TESSLEVEL] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_WIREFRAME: " << _uniformLocations[UNIFORM_WIREFRAME] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_LIGHTSOURCE: " << _uniformLocations[UNIFORM_LIGHTSOURCE] <<  std::endl;
-		std::cout << std::setw(32) << std::left << "   UNIFORM_USETEXTURE: " << _uniformLocations[UNIFORM_USETEXTURE] <<  std::endl;
+		
 	}
 }
 
 GLint gl4::Shader::getUniformLocation(int uniform)
 {
 	return _uniformLocations[uniform];
+}
+
+void gl4::Shader::printUniforms(bool all) 
+{
+	_printUniform(std::cout, "UNIFORM_PROJECTION", UNIFORM_PROJECTION, all);
+	_printUniform(std::cout, "UNIFORM_MODELTRANSFORM", UNIFORM_MODELTRANSFORM, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE1", UNIFORM_TEXTURE1, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE2", UNIFORM_TEXTURE2, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE2", UNIFORM_TEXTURE2, all);
+	_printUniform(std::cout, "UNIFORM_TESSLEVEL", UNIFORM_TESSLEVEL, all);
+	_printUniform(std::cout, "UNIFORM_WIREFRAME", UNIFORM_WIREFRAME, all);
+	_printUniform(std::cout, "UNIFORM_LIGHTSOURCE", UNIFORM_LIGHTSOURCE, all);
+	_printUniform(std::cout, "UNIFORM_USETEXTURE", UNIFORM_USETEXTURE, all);
+	_printUniform(std::cout, "UNIFORM_WINDOWSIZE", UNIFORM_WINDOWSIZE, all);
+}
+
+void gl4::Shader::_printUniform(std::ostream &out, const char *name, int uniform, bool set)
+{
+	if (set || _uniformLocations[uniform] > -1)
+	{
+		out 	<< "   " << std::setw(28) << std::left << name
+				<< std::setw(3) << std::right << _uniformLocations[uniform] 
+				<< std::endl;
+	}
 }
 
 bool gl4::Shader::attachVertexShader(const char *filename)

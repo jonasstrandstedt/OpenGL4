@@ -28,48 +28,39 @@ gl4::ShaderManager::ShaderManager()
 
 	// set the active shader to none
 	_activeShader = 0;
-/*
-	Shader *s1 = new Shader();
-	s1->init();
-	s1->attachVertexShader("GL4-engine/shaders/Passthrough.vert");
-	s1->attachFragmentShader("GL4-engine/shaders/Passthrough.frag");
-	s1->link();
-	
-	Shader *s2 = new Shader("GL4-engine/shaders/Passthrough.vert", "GL4-engine/shaders/Textured.frag");
-*/
 	Shader *s3 = new Shader(	"GL4-engine/shaders/Deferred1_VS.glsl", 
 								"GL4-engine/shaders/Deferred1_FS.glsl", 
 								"GL4-engine/shaders/Deferred1_GS.glsl"
 							);
-	/*, 
-								"GL4-engine/shaders/Deferred1_TS_control.glsl", 
-								"GL4-engine/shaders/Deferred1_TS_eval.glsl"
-								*/
-/*
+
 	Shader *s4 = new Shader(	"GL4-engine/shaders/Sphere_VS.glsl", 
 								"GL4-engine/shaders/Sphere_FS.glsl", 
 								"GL4-engine/shaders/Sphere_GS.glsl", 
 								"GL4-engine/shaders/Sphere_TS_control.glsl", 
 								"GL4-engine/shaders/Sphere_TS_eval.glsl"
 							);
-*/
-	Shader *s5 = new Shader("GL4-engine/shaders/Deferred.vert", "GL4-engine/shaders/Deferred2.frag");
 
-	//addShaderProgram("Passthrough", s1);
-	//addShaderProgram("Textured", s2);
+	Shader *s5 = new Shader("GL4-engine/shaders/Deferred2_VS.glsl", "GL4-engine/shaders/Deferred2_FS.glsl");
+
 	addShaderProgram("Deferred1", s3);
-	//addShaderProgram("Deferred1_sphere", s4);
+	addShaderProgram("Deferred1_sphere", s4);
 	addShaderProgram("Deferred2", s5);
 }
 
 gl4::ShaderManager::~ShaderManager()
 {
-
+	std::map< std::string,Shader* >::iterator it;
+	it = _shaders.begin();
+	while (it != _shaders.end())
+	{
+		delete (*it).second;
+	}
 }
 
 void gl4::ShaderManager::addShaderProgram(std::string name, Shader *program)
 {
-	
+	std::cout << "Adding shader program [ " << name << " ]: " << std::endl;
+	program->printUniforms();
 	_shaders.insert(std::pair<std::string,Shader*>(name,program));
 }
 
@@ -96,6 +87,7 @@ void gl4::ShaderManager::bindShader(std::string shader)
 		_activeShader = (*it).second;
 		glUseProgram( _activeShader->getShaderProgram());
 	} else {
+		std::cerr << "ShaderManager could not find [ " << shader<< " ]" << std::endl;
 		_activeShader = 0;
 		glUseProgram(0);
 	}
