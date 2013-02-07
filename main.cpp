@@ -92,55 +92,33 @@ void myInitFunc(void)
 	gl4::TextureManager::getInstance()->loadTexture("earth_displacement", "data/earth_nasa_topography_lowres.tga");
 
 	deferredEngine = engine->getDeferredRender();
+	deferredEngine->addExtendedDeferredShaderFromFile("plane", "GL4-engine/shaders/DeferredUser.glsl");
 }
 
 void myRenderFunc(void) 
 {
-	/*
-	// draw a colored plane
-	gl4::ShaderManager::getInstance()->bindShader("Passthrough");
-	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
-	plane_transform = glm::translate(plane_transform,glm::vec3(-0.5,-0.3, 0.0));
-	plane_transform = glm::rotate(plane_transform,-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	engine->usePerspectiveProjection(plane_transform);
-	obj->render();
-	gl4::ShaderManager::getInstance()->unbindShader();
-	*/
-/*
 
-	// draw the earth
-	gl4::ShaderManager::getInstance()->bindShader("Deferred1_sphere");
-
-	// bind earth texture
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gl4::TextureManager::getInstance()->getTexture("earth_diffuse"));
-	glUniform1i(3, 0);
-
-	// bind heightmap
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D,  gl4::TextureManager::getInstance()->getTexture("earth_displacement"));
-	glUniform1i(4, 1);
-
-	// rotate around the x-axis and y-axis
-	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
-	transform = glm::rotate(transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
-	engine->usePerspectiveProjection(transform);
-
-	// set tessellation levels
-	glUniform1f(5, tess); // set tessellation level
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
-	sphere->render();
-
-	// unbind
-	glBindTexture(GL_TEXTURE_2D, 0);
-	gl4::ShaderManager::getInstance()->unbindShader();
-	*/	
 }
 
+/**
+* The deferred renderer is thought of as a "programmable fixed" pipeline.
+* The main purpose is not to be fast or efficient but to enable users of 
+* the GL4 engine to get the appplication up and running fast without having 
+* to create the shaders steps themselves.
+*
+* The deferred renderer is called before the standard render function and is 
+* rendered in two steps. The first is rendering to a multisampled FBO and then 
+* rendered on a quad where the light calculations take place. This 
+* 
+* Usage of 'deferredEngine->bindShader("shadername");' insted of
+* 'ShaderManager::getInstance()->bindShader(shader);' is important since the
+* deferredEngine is binding the neccessary uniforms.
+*/
 void myDeferredRenderFunc(void) 
 {
 	
 	// draw a colored plane
+	//deferredEngine->bindShader("plane");
 	deferredEngine->useState(DEFERRED_WIREFRAME, wireframe);
 
 	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
@@ -150,6 +128,8 @@ void myDeferredRenderFunc(void)
 	engine->usePerspectiveProjection(plane_transform);
 	obj->render();
 
+
+	deferredEngine->bindDefaultShader();
 	deferredEngine->useState(DEFERRED_TEXTURE, true);
 
 	// bind earth texture

@@ -19,6 +19,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// other libraries
+#include <string>
+
 #include "FBO.h"
 #include "VBO.h"
 
@@ -33,17 +36,21 @@ namespace gl4
 	class DeferredRender
 	{
 		public:
+
 			DeferredRender();
 			~DeferredRender();
 
 			void init(unsigned int windowWidth, unsigned int windowHeight);
+			void addExtendedDeferredShaderFromFile(std::string name, const char *filename = 0);
+			void bindDefaultShader();
+			void bindShader(std::string shader);
 			void enable(int state);
 			void disable(int state);
 			void useState(int uniform, bool state);
 			void render(void (*f)(void));
 
 		private:
-			//
+			// variables
 			unsigned int _windowWidth;
 			unsigned int _windowHeight;
 			glm::mat4 _orthogonalProjectionMatrix;

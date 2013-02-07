@@ -19,28 +19,34 @@ layout(location = 7) uniform bool Wireframe;
 layout(location = 8) uniform bool Lightsource;
 layout(location = 9) uniform bool UseTexture;
 
-layout(location = 0) in vec3 vertex_position;
-layout(location = 1) in vec2 vertex_tex;
-layout(location = 2) in vec3 vertex_normal;
-layout(location = 3) in vec4 vertex_color;
-layout(location = 4) in vec3 vertex_attribute3f;
-layout(location = 5) in float vertex_attribute1f;
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec2 in_st;
+layout(location = 2) in vec3 in_normal;
+layout(location = 3) in vec4 in_color;
+layout(location = 4) in vec3 in_attribute3f;
+layout(location = 5) in float in_attribute1f;
 
-layout(location = 0) out vec2 st;
-layout(location = 1) out vec3 stp;
-layout(location = 2) out vec4 fragment_normal;
-layout(location = 3) out vec4 fragment_color;
-layout(location = 4) out vec4 fragment_position;
+layout(location = 0) out vec2 out_st;
+layout(location = 1) out vec3 out_stp;
+layout(location = 2) out vec4 out_normal;
+layout(location = 3) out vec4 out_color;
+layout(location = 4) out vec4 out_position;
+
+void VS();
 
 void main()
 {
+	out_st = in_st;
+	out_stp = in_position;
+	out_normal = normalize(ModelTransform * vec4(in_normal,1));
+	out_color = in_color;
+	out_position = ModelTransform * vec4(in_position,1);
+	gl_Position =  Projection* out_position;
 
-	st = vertex_tex;
-	stp = vertex_position;
-	fragment_normal = normalize(ModelTransform * vec4(vertex_normal,1));
-	fragment_color = vertex_color;
-	fragment_position = ModelTransform * vec4(vertex_position,1);
+	VS();
 
-	gl_Position =  Projection* fragment_position;
+}
 
+void VS() 
+{
 }

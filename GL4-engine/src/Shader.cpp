@@ -47,7 +47,7 @@ gl4::Shader::Shader(const char *vertfilename, const char *fragfilename, const ch
 
 gl4::Shader::~Shader()
 {
-
+	glDeleteShader(_shaderProgram);
 }
 
 void gl4::Shader::init()
@@ -79,9 +79,7 @@ void gl4::Shader::link()
 		_uniformLocations[UNIFORM_LIGHTSOURCE] = glGetUniformLocation( _shaderProgram, "Lightsource");
 		_uniformLocations[UNIFORM_USETEXTURE] = glGetUniformLocation( _shaderProgram, "UseTexture");
 		_uniformLocations[UNIFORM_WINDOWSIZE] = glGetUniformLocation( _shaderProgram, "WindowSize");
-
-
-		
+		_uniformLocations[UNIFORM_TIME] = glGetUniformLocation( _shaderProgram, "applicationTime");
 	}
 }
 
@@ -94,6 +92,7 @@ void gl4::Shader::printUniforms(bool all)
 {
 	_printUniform(std::cout, "UNIFORM_PROJECTION", UNIFORM_PROJECTION, all);
 	_printUniform(std::cout, "UNIFORM_MODELTRANSFORM", UNIFORM_MODELTRANSFORM, all);
+	_printUniform(std::cout, "UNIFORM_TIME", UNIFORM_TIME, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE1", UNIFORM_TEXTURE1, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE2", UNIFORM_TEXTURE2, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE2", UNIFORM_TEXTURE2, all);

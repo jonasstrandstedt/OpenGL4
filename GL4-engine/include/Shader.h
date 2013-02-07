@@ -25,7 +25,8 @@ enum {
 	UNIFORM_WIREFRAME,
 	UNIFORM_LIGHTSOURCE,
 	UNIFORM_USETEXTURE,
-	UNIFORM_WINDOWSIZE
+	UNIFORM_WINDOWSIZE,
+	UNIFORM_TIME
 };
 
 
@@ -56,14 +57,11 @@ namespace gl4
 
 
 	private:
-
 		void _printUniform(std::ostream &out, const char *name, int uniform, bool set = false);
-
-		GLuint _shaderProgram;
-
-		GLint _uniformLocations[16];
-
 		GLuint _compileShader(GLenum shaderType, const char *filename, const char *shaderString);
+	protected:
+		GLuint _shaderProgram;
+		GLint _uniformLocations[16];
 		char* _readShaderFile(const char *filename);
 	};
 }

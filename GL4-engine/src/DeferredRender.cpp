@@ -9,6 +9,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 #include "DeferredRender.h"
 #include "ShaderManager.h"
+#include "DeferredShader.h"
+
+const char *deferred1 = "Deferred1";
+const char *deferred2 = "Deferred2";
 
 
 gl4::DeferredRender::DeferredRender() 
@@ -43,6 +47,28 @@ void gl4::DeferredRender::init(unsigned int windowWidth, unsigned int windowHeig
 												glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 																);
 	_orthogonalProjectionMatrix = Orthogonal * OrthogonalView;
+
+	addExtendedDeferredShaderFromFile(deferred1);
+}
+
+void gl4::DeferredRender::addExtendedDeferredShaderFromFile(std::string name, const char *filename)
+{
+	ShaderManager::getInstance()->addShaderProgram(name, new DeferredShader(filename));
+}
+
+void gl4::DeferredRender::bindDefaultShader()
+{
+	bindShader(deferred1);
+}
+
+void gl4::DeferredRender::bindShader(std::string shader)
+{
+	ShaderManager::getInstance()->bindShader(shader);
+	glUniform1f(UNIFORM_LOCATION(UNIFORM_TIME), (float)glfwGetTime());
+	glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), _wireframe);
+	glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), _lightsource);
+	glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), 0);
+	glUniform2f(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE), _windowWidth, _windowHeight);
 }
 
 void gl4::DeferredRender::enable(int state)
@@ -75,6 +101,7 @@ void gl4::DeferredRender::disable(int state)
 
 void gl4::DeferredRender::useState(int uniform, bool state)
 {
+	//enable(state);
 	switch(uniform) {
 		case DEFERRED_WIREFRAME:
 			glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), state);
@@ -94,22 +121,14 @@ void gl4::DeferredRender::render(void (*renderFunc)(void))
 	// start stage 1
 	_standard.clear();
 	_standard.bind();
-	gl4::ShaderManager::getInstance()->bindShader("Deferred1");
-
-	glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), _wireframe);
-	glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), _lightsource);
-	glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), 0);
-	glUniform2f(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE), _windowWidth, _windowHeight);
-
+	bindDefaultShader();
 	renderFunc();
-
 	gl4::ShaderManager::getInstance()->unbindShader();
-
 	_standard.unbind();
 	// end stage 1
 
 	// start stage 2
-	gl4::ShaderManager::getInstance()->bindShader("Deferred2");
+	gl4::ShaderManager::getInstance()->bindShader(deferred2);
 
 	// orthogonal projection
 	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
@@ -117,7 +136,7 @@ void gl4::DeferredRender::render(void (*renderFunc)(void))
 	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 	// render the FBO texture
-	_standard.bindTextures(gl4::ShaderManager::getInstance()->getActiveShaderUniform(UNIFORM_TEXTURE1));
+	_standard.bindTextures(3);
 	_quad.render();
 
 	// unbind texture and shader

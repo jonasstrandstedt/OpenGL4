@@ -11,13 +11,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
-
-
-
-
-
-
-
+layout(location = 3) uniform sampler2D texture1;
+layout(location = 4) uniform sampler2D texture2;
+layout(location = 5) uniform sampler2D texture3;
+layout(location = 6) uniform sampler2D texture4;
 
 layout(location = 0) in vec3 vertex_position;
 layout(location = 1) in vec2 vertex_tex;

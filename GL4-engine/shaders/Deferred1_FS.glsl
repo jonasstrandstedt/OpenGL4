@@ -19,35 +19,42 @@ layout(location = 7) uniform bool Wireframe;
 layout(location = 8) uniform bool Lightsource;
 layout(location = 9) uniform bool UseTexture;
 
-layout(location = 0) in vec2 st;
-layout(location = 1) in vec3 stp;
-layout(location = 2) in vec4 fragment_normal;
-layout(location = 3) in vec4 fragment_color;
-layout(location = 4) in vec4 fragment_position;
-layout(location = 5) in vec3 distance_to_edge;
+layout(location = 0) in vec2 in_st;
+layout(location = 1) in vec3 in_stp;
+layout(location = 2) in vec4 in_normal;
+layout(location = 3) in vec4 in_color;
+layout(location = 4) in vec4 in_position;
+layout(location = 5) in vec3 in_distance_to_edge;
 
 layout(location = 0) out vec4 diffuse;
 layout(location = 1) out vec4 position;
 layout(location = 2) out vec4 normal;
 
+void FS();
+
 void main()
 {
+
 	if(UseTexture)
 	{
-		diffuse = texture2D(texture1, st);
+		diffuse = texture2D(texture1, in_st);
 	} else {
-		diffuse = fragment_color;
+		diffuse = in_color;
 	}
 
+	position = in_position;
+	normal = in_normal;
+
+	FS();
+	
 	// if wireframe is activated, the distance is calculated in pixels
 	if(Wireframe) 
 	{
-		float dist = min(min(distance_to_edge.x, distance_to_edge.y), distance_to_edge.z);
-		if(dist < 1.0) {
-			diffuse = vec4(1,1,1,1);
-		}
+
+		float dist = min(min(in_distance_to_edge.x, in_distance_to_edge.y), in_distance_to_edge.z);
+		float stepp = 1.0-smoothstep(1.0,2.0,dist);
+		diffuse = mix(diffuse,vec4(1,1,1,1), stepp);
 	}
 
-	position = fragment_position;
-	normal = fragment_normal;
+
 }

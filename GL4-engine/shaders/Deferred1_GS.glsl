@@ -25,9 +25,9 @@ layout(location = 10) uniform vec2 WindowSize;
 
 layout(location = 0) in vec2 in_st[3];
 layout(location = 1) in vec3 in_stp[3];
-layout(location = 2) in vec4 in_fragment_normal[3];
-layout(location = 3) in vec4 in_fragment_color[3];
-layout(location = 4) in vec4 in_fragment_position[3];
+layout(location = 2) in vec4 in_normal[3];
+layout(location = 3) in vec4 in_color[3];
+layout(location = 4) in vec4 in_position[3];
 
 layout(location = 0) out vec2 st_out;
 layout(location = 1) out vec3 stp_out;
@@ -35,52 +35,44 @@ layout(location = 2) out vec3 fragment_normal_out;
 
 layout(location = 0) out vec2 out_st;
 layout(location = 1) out vec3 out_stp;
-layout(location = 2) out vec4 out_fragment_normal;
-layout(location = 3) out vec4 out_fragment_color;
-layout(location = 4) out vec4 out_fragment_position;
+layout(location = 2) out vec4 out_normal;
+layout(location = 3) out vec4 out_color;
+layout(location = 4) out vec4 out_position;
 layout(location = 5) out vec3 out_distance_to_edge;
+
+void GS(int i);
 
 void main()
 {
     // taken from 'Single-Pass Wireframe Rendering'
+    vec2 v[3];
     vec2 p0 = WindowSize * gl_in[0].gl_Position.xy/gl_in[0].gl_Position.w;
     vec2 p1 = WindowSize * gl_in[1].gl_Position.xy/gl_in[1].gl_Position.w;
     vec2 p2 = WindowSize * gl_in[2].gl_Position.xy/gl_in[2].gl_Position.w;
-    vec2 v0 = p2-p1;
-    vec2 v1 = p2-p0;
-    vec2 v2 = p1-p0;
-    float area = abs(v1.x*v2.y - v1.y * v2.x);
 
-    out_st = in_st[0];
-    out_stp = in_stp[0];
-    out_fragment_normal = normalize(in_fragment_normal[0]);
-    out_fragment_color = in_fragment_color[0];
-    out_fragment_position = in_fragment_position[0];
-    out_distance_to_edge = vec3(1, 0, 0);
-    out_distance_to_edge = vec3(area/length(v0),0,0);
-    gl_Position = gl_in[0].gl_Position; 
-    EmitVertex();
+    v[0] = p2-p1;
+    v[1] = p2-p0;
+    v[2] = p1-p0;
+    float area = abs(v[1].x*v[2].y - v[1].y * v[2].x);
+
+    for(int i = 0; i < 3; i++)
+    {
+        out_st = in_st[i];
+        out_stp = in_stp[i];
+        out_normal = in_normal[i];
+        out_color = in_color[i];
+        out_position = in_position[i];
+        float dist = area/length(v[i]);
+        out_distance_to_edge = vec3(0,0,0);
+        out_distance_to_edge[i] = dist;
+        gl_Position = gl_in[i].gl_Position; 
+        GS(i);
+        EmitVertex();
+
+    }
     
-    out_st = in_st[1];
-    out_stp = in_stp[1];
-    out_fragment_normal = normalize(in_fragment_normal[1]);
-    out_fragment_color = in_fragment_color[1];
-    out_fragment_position = in_fragment_position[1];
-    out_distance_to_edge = vec3(0, 1, 0);
-    out_distance_to_edge = vec3(0,area/length(v1),0);
-    gl_Position = gl_in[1].gl_Position; 
-    EmitVertex();
+}
 
-    out_st = in_st[2];
-    out_stp = in_stp[2];
-    out_fragment_normal = normalize(in_fragment_normal[2]);
-    out_fragment_color = in_fragment_color[2];
-    out_fragment_position = in_fragment_position[2];
-    out_distance_to_edge = vec3(0, 0, 1);
-    out_distance_to_edge = vec3(0,0,area/length(v2));
-    gl_Position = gl_in[2].gl_Position; 
-    EmitVertex();
-
-    EndPrimitive();
-    
+void GS(int i)
+{
 }
