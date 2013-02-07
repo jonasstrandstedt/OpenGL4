@@ -79,7 +79,7 @@ void gl4::Shader::link()
 		_uniformLocations[UNIFORM_LIGHTSOURCE] = glGetUniformLocation( _shaderProgram, "Lightsource");
 		_uniformLocations[UNIFORM_USETEXTURE] = glGetUniformLocation( _shaderProgram, "UseTexture");
 		_uniformLocations[UNIFORM_WINDOWSIZE] = glGetUniformLocation( _shaderProgram, "WindowSize");
-		_uniformLocations[UNIFORM_TIME] = glGetUniformLocation( _shaderProgram, "applicationTime");
+		_uniformLocations[UNIFORM_TIME] = glGetUniformLocation( _shaderProgram, "time");
 	}
 }
 

@@ -14,6 +14,7 @@ layout(triangle_strip, max_vertices = 3) out;
 
 layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
+layout(location = 2) uniform float time;
 layout(location = 3) uniform sampler2D texture1;
 layout(location = 4) uniform sampler2D texture2;
 layout(location = 5) uniform sampler2D texture3;
@@ -71,8 +72,4 @@ void main()
 
     }
     
-}
-
-void GS(int i)
-{
 }

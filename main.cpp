@@ -15,7 +15,7 @@ gl4::Sphere *sphere;
 gl4::Engine *engine;
 gl4::DeferredRender *deferredEngine;
 glm::vec2 angle;
-bool wireframe = true;
+bool wireframe = false;
 
 int tess;
 
@@ -92,7 +92,7 @@ void myInitFunc(void)
 	gl4::TextureManager::getInstance()->loadTexture("earth_displacement", "data/earth_nasa_topography_lowres.tga");
 
 	deferredEngine = engine->getDeferredRender();
-	deferredEngine->addExtendedDeferredShaderFromFile("plane", "GL4-engine/shaders/DeferredUser.glsl");
+	deferredEngine->addExtendedDeferredShaderFromFile("plane", "data/shaders/DeferredUser.glsl");
 }
 
 void myRenderFunc(void) 
@@ -110,16 +110,16 @@ void myRenderFunc(void)
 * rendered in two steps. The first is rendering to a multisampled FBO and then 
 * rendered on a quad where the light calculations take place. This 
 * 
-* Usage of 'deferredEngine->bindShader("shadername");' insted of
-* 'ShaderManager::getInstance()->bindShader(shader);' is important since the
-* deferredEngine is binding the neccessary uniforms.
+* Please note:
+* 	Use 'deferredEngine->bindShader("shadername");' insted of
+* 	'ShaderManager::getInstance()->bindShader(shader);' since the deferredEngine 
+* 	is binding the neccessary uniforms.
 */
 void myDeferredRenderFunc(void) 
 {
 	
-	// draw a colored plane
-	//deferredEngine->bindShader("plane");
-	deferredEngine->useState(DEFERRED_WIREFRAME, wireframe);
+	// draw a colored plane with user defined deferred shader
+	deferredEngine->bindShader("plane");
 
 	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
 	plane_transform = glm::translate(plane_transform,glm::vec3(-0.5,-0.3, 0.0));
@@ -128,7 +128,7 @@ void myDeferredRenderFunc(void)
 	engine->usePerspectiveProjection(plane_transform);
 	obj->render();
 
-
+	// switch back to default shader and activate textures
 	deferredEngine->bindDefaultShader();
 	deferredEngine->useState(DEFERRED_TEXTURE, true);
 
@@ -151,6 +151,10 @@ void myDeferredRenderFunc(void)
 
 void myUpdateFunc(float dt)
 {
+	if(wireframe)
+		deferredEngine->enable(DEFERRED_WIREFRAME);
+	else
+		deferredEngine->disable(DEFERRED_WIREFRAME);
 
 	float speed = 50.0f;
 	if(engine->isKeyPressed(GLFW_KEY_RIGHT)) {

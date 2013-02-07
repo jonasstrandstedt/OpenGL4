@@ -16,7 +16,7 @@ void GS(int i)
 //<!-- FS start -->
 void FS()
 {
-	float intensity = abs(sin(3.14/2*applicationTime));
-	diffuse = vec4(intensity,1,0,1);
+	float intensity = abs(sin(time));
+	diffuse = vec4(intensity,0,0,1);
 }
 //<!-- FS stop -->

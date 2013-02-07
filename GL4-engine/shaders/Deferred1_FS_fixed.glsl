@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 layout(location = 0) uniform mat4 Projection;
 layout(location = 1) uniform mat4 ModelTransform;
+layout(location = 2) uniform float time;
 layout(location = 3) uniform sampler2D texture1;
 layout(location = 4) uniform sampler2D texture2;
 layout(location = 5) uniform sampler2D texture3;
@@ -44,9 +45,7 @@ void main()
 
 	position = in_position;
 	normal = in_normal;
-
 	FS();
-	
 	// if wireframe is activated, the distance is calculated in pixels
 	if(Wireframe) 
 	{
@@ -55,6 +54,4 @@ void main()
 		float stepp = 1.0-smoothstep(1.0,2.0,dist);
 		diffuse = mix(diffuse,vec4(1,1,1,1), stepp);
 	}
-
-
 }

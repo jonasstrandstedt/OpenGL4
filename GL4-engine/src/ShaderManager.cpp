@@ -28,12 +28,7 @@ gl4::ShaderManager::ShaderManager()
 
 	// set the active shader to none
 	_activeShader = 0;
-	/*
-	Shader *s3 = new Shader(	"GL4-engine/shaders/Deferred1_VS.glsl", 
-								"GL4-engine/shaders/Deferred1_FS.glsl", 
-								"GL4-engine/shaders/Deferred1_GS.glsl"
-							);
-*/
+	
 	Shader *s4 = new Shader(	"GL4-engine/shaders/Sphere_VS.glsl", 
 								"GL4-engine/shaders/Sphere_FS.glsl", 
 								"GL4-engine/shaders/Sphere_GS.glsl", 
@@ -43,7 +38,6 @@ gl4::ShaderManager::ShaderManager()
 
 	Shader *s5 = new Shader("GL4-engine/shaders/Deferred2_VS.glsl", "GL4-engine/shaders/Deferred2_FS.glsl");
 
-	//addShaderProgram("Deferred1", s3);
 	addShaderProgram("Deferred1_sphere", s4);
 	addShaderProgram("Deferred2", s5);
 }
