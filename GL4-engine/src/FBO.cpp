@@ -8,6 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "FBO.h"
+#include "ShaderManager.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -35,9 +36,9 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	_textures = textures;
 
 	_fboTextureId = new GLuint[textures];
-	GLuint _rboId[textures];
+	GLuint *_rboId = new GLuint[textures];
 	GLuint _dboId = -1;
-	GLuint _rboId_multisampled[textures];
+	GLuint *_rboId_multisampled = new GLuint[textures];
 	GLuint _dboId_multisampled = -1;
 
 	_w = width;
@@ -158,7 +159,7 @@ void gl4::FBO::bind() {
 	GLuint errorID = glGetError();
 	if(errorID != GL_NO_ERROR)
 	{
-		std::cerr 	<< " OpenGL error: " << gluErrorString(errorID) << std::endl
+		std::cerr 	<< " OpenGL error: " << glewGetErrorString(errorID) << std::endl
 					<< "Attempting to proceed anyway. Expect rendering errors or a crash." << std::endl;
 	}
 }
@@ -206,12 +207,12 @@ GLuint gl4::FBO::getTexture(GLuint i)
 	return _fboTextureId[i];
 }
 
-void gl4::FBO::bindTextures(GLuint uniformStart)
+void gl4::FBO::bindTextures()
 {
 	for (int i = 0; i < _textures; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, _fboTextureId[i]);
-		glUniform1i(uniformStart + i, i);
+		glUniform1i(UNIFORM_LOCATION(UNIFORM_TEXTURE1 + i), i);
 	}
 }

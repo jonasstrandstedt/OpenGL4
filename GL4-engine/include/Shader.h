@@ -21,6 +21,11 @@ enum {
 	UNIFORM_TEXTURE1,
 	UNIFORM_TEXTURE2,
 	UNIFORM_TEXTURE3,
+	UNIFORM_TEXTURE4,
+	UNIFORM_TEXTURE5,
+	UNIFORM_TEXTURE6,
+	UNIFORM_TEXTURE7,
+	UNIFORM_TEXTURE8,
 	UNIFORM_TESSLEVEL,
 	UNIFORM_WIREFRAME,
 	UNIFORM_LIGHTSOURCE,
@@ -61,7 +66,7 @@ namespace gl4
 		GLuint _compileShader(GLenum shaderType, const char *filename, const char *shaderString);
 	protected:
 		GLuint _shaderProgram;
-		GLint _uniformLocations[16];
+		GLint _uniformLocations[20];
 		char* _readShaderFile(const char *filename);
 	};
 }

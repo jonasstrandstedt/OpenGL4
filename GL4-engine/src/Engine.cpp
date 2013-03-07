@@ -172,7 +172,6 @@ void gl4::Engine::render() {
 		}
 		_t0 = t;
 
-
 		// Clear the default color buffer
 		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

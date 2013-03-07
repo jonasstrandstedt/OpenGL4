@@ -74,6 +74,11 @@ void gl4::Shader::link()
 		_uniformLocations[UNIFORM_TEXTURE1] = glGetUniformLocation( _shaderProgram, "texture1");
 		_uniformLocations[UNIFORM_TEXTURE2] = glGetUniformLocation( _shaderProgram, "texture2");
 		_uniformLocations[UNIFORM_TEXTURE3] = glGetUniformLocation( _shaderProgram, "texture3");
+		_uniformLocations[UNIFORM_TEXTURE4] = glGetUniformLocation( _shaderProgram, "texture4");
+		_uniformLocations[UNIFORM_TEXTURE5] = glGetUniformLocation( _shaderProgram, "texture5");
+		_uniformLocations[UNIFORM_TEXTURE6] = glGetUniformLocation( _shaderProgram, "texture6");
+		_uniformLocations[UNIFORM_TEXTURE7] = glGetUniformLocation( _shaderProgram, "texture7");
+		_uniformLocations[UNIFORM_TEXTURE8] = glGetUniformLocation( _shaderProgram, "texture8");
 		_uniformLocations[UNIFORM_TESSLEVEL] = glGetUniformLocation( _shaderProgram, "TessLevel");
 		_uniformLocations[UNIFORM_WIREFRAME] = glGetUniformLocation( _shaderProgram, "Wireframe");
 		_uniformLocations[UNIFORM_LIGHTSOURCE] = glGetUniformLocation( _shaderProgram, "Lightsource");
@@ -95,7 +100,12 @@ void gl4::Shader::printUniforms(bool all)
 	_printUniform(std::cout, "UNIFORM_TIME", UNIFORM_TIME, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE1", UNIFORM_TEXTURE1, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE2", UNIFORM_TEXTURE2, all);
-	_printUniform(std::cout, "UNIFORM_TEXTURE2", UNIFORM_TEXTURE2, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE3", UNIFORM_TEXTURE3, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE4", UNIFORM_TEXTURE4, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE5", UNIFORM_TEXTURE5, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE6", UNIFORM_TEXTURE6, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE7", UNIFORM_TEXTURE7, all);
+	_printUniform(std::cout, "UNIFORM_TEXTURE8", UNIFORM_TEXTURE8, all);
 	_printUniform(std::cout, "UNIFORM_TESSLEVEL", UNIFORM_TESSLEVEL, all);
 	_printUniform(std::cout, "UNIFORM_WIREFRAME", UNIFORM_WIREFRAME, all);
 	_printUniform(std::cout, "UNIFORM_LIGHTSOURCE", UNIFORM_LIGHTSOURCE, all);

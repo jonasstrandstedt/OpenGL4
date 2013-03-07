@@ -1,6 +1,6 @@
 #OpenGL4
 
-A simple OpenGL 4 engine. The purpose is for me to learn OpenGL4 and create an engine that is easy to use.
+A simple OpenGL 4 engine. The purpose is for me to learn OpenGL4 and create an engine that is easy to use in other projects.
 
 ##MIT-Licence
 Copyright (C) 2012-2014 Jonas Strandstedt

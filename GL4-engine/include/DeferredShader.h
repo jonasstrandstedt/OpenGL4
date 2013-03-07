@@ -19,19 +19,17 @@ namespace gl4
 	{
 	public:
 
-
 		//initializers
-		DeferredShader(const char *filename = 0);
+		DeferredShader(const char *filename = 0, bool pass2 = false);
 		~DeferredShader();
-
 
 	private:
 		GLuint _compileShaderSource(GLenum shaderType, const char *source, const char *shaderString);
-		std::string _getPartOfString(std::string s, std::string s1, std::string s2);
+		std::string _getPartOfString(std::string s, std::string s1, std::string s2, std::string nothing = "");
 
-		void _generateVertexShader(const char *filename);
-		void _generateFragmentShader(const char *filename);
-		void _generateGeometryShader(const char *filename);
+		void _generateVertexShader(const char *filename, const char *fixed_source);
+		void _generateFragmentShader(const char *filename, const char *fixed_source);
+		void _generateGeometryShader(const char *filename, const char *fixed_source);
 	};
 }
 

@@ -149,7 +149,7 @@ void gl4::VBO::init()
 	errorID = glGetError();
 	if(errorID != GL_NO_ERROR)
 	{
-		std::cerr << "OpenGL error: " << gluErrorString(errorID) << std::endl;
+		std::cerr << "OpenGL error: " << glewGetErrorString(errorID) << std::endl;
 		std::cerr << "Attempting to proceed anyway. Expect rendering errors or a crash." << std::endl;
 	}
 

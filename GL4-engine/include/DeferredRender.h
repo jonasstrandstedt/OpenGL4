@@ -41,7 +41,7 @@ namespace gl4
 			~DeferredRender();
 
 			void init(unsigned int windowWidth, unsigned int windowHeight);
-			void addExtendedDeferredShaderFromFile(std::string name, const char *filename = 0);
+			void addExtendedDeferredShaderFromFile(std::string name, const char *filename = 0, bool pass2 = false);
 			void bindDefaultShader();
 			void bindShader(std::string shader);
 			void enable(int state);

@@ -24,6 +24,7 @@ namespace gl4
 
 		void loadTexture(std::string name, const char *filename);
 		GLuint getTexture(std::string name);
+		void bindTexture(std::string name, unsigned int position = 0);
 
 	private:
 		TextureManager();

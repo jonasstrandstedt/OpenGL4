@@ -8,38 +8,40 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "DeferredShader.h"
+#include "DeferredShaderSources.h"
 #include <iostream>
 #include <iomanip>
 #include <cstring>
-const char *empty = "void VS(){}void GS(int i){}void FS(){}";
 
-gl4::DeferredShader::DeferredShader(const char *filename)
+gl4::DeferredShader::DeferredShader(const char *filename, bool pass2)
 {
 	init();
-
-	_generateVertexShader(filename);
-	_generateFragmentShader(filename);
-	_generateGeometryShader(filename);
-
+	if(!pass2) 
+	{
+		_generateVertexShader(filename,fixed_vs_pass1);
+		_generateFragmentShader(filename,fixed_fs_pass1);
+		_generateGeometryShader(filename,fixed_gs_pass1);
+	} else {
+		_generateVertexShader(filename,fixed_vs_pass2);
+		_generateFragmentShader(filename,fixed_fs_pass2);
+	}
 	link();
 }
-
 
 gl4::DeferredShader::~DeferredShader()
 {
 	
 }
 
-void gl4::DeferredShader::_generateVertexShader(const char *filename)
+void gl4::DeferredShader::_generateVertexShader(const char *filename, const char *fixed_source)
 {
-	const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_VS_fixed.glsl");
-
+	//const char * fixed_source = _readShaderFile("GL4-engine/shaders/Deferred1_VS_fixed.glsl");
 	char finalsource[16384];
-	strcpy(finalsource, source);
+	strcpy(finalsource, fixed_source);
 	const char *usersource; 
 	if (filename != 0)
 	{
-		usersource = _getPartOfString(_readShaderFile(filename),"//<!-- VS start -->","//<!-- VS stop -->").c_str();
+		usersource = _getPartOfString(_readShaderFile(filename),"//<!-- VS start -->","//<!-- VS stop -->","void VS(){}").c_str();
 		strcat(finalsource,usersource);
 	} else {
 		strcat(finalsource,empty);
@@ -52,17 +54,15 @@ void gl4::DeferredShader::_generateVertexShader(const char *filename)
 	}
 }
 
-void gl4::DeferredShader::_generateFragmentShader(const char *filename)
+void gl4::DeferredShader::_generateFragmentShader(const char *filename, const char *fixed_source)
 {
-	
-	const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_FS_fixed.glsl");
-
+	//const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_FS_fixed.glsl");
 	char finalsource[16384];
-	strcpy(finalsource, source);
+	strcpy(finalsource, fixed_source);
 	const char *usersource; 
 	if (filename != 0)
 	{
-		usersource = _getPartOfString(_readShaderFile(filename),"//<!-- FS start -->","//<!-- FS stop -->").c_str();
+		usersource = _getPartOfString(_readShaderFile(filename),"//<!-- FS start -->","//<!-- FS stop -->","void FS()").c_str();
 		strcat(finalsource,usersource);
 	} else {
 		strcat(finalsource,empty);
@@ -76,17 +76,15 @@ void gl4::DeferredShader::_generateFragmentShader(const char *filename)
 
 }
 
-void gl4::DeferredShader::_generateGeometryShader(const char *filename)
+void gl4::DeferredShader::_generateGeometryShader(const char *filename, const char *fixed_source)
 {
-	
-	const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_GS_fixed.glsl");
-	
+	//const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_GS_fixed.glsl");
 	char finalsource[16384];
-	strcpy(finalsource, source);
+	strcpy(finalsource, fixed_source);
 	const char *usersource; 
 	if (filename != 0)
 	{
-		usersource = _getPartOfString(_readShaderFile(filename),"//<!-- GS start -->","//<!-- GS stop -->").c_str();
+		usersource = _getPartOfString(_readShaderFile(filename),"//<!-- GS start -->","//<!-- GS stop -->","void GS(int i){}").c_str();
 		strcat(finalsource,usersource);
 	} else {
 		strcat(finalsource,empty);
@@ -124,16 +122,16 @@ GLuint gl4::DeferredShader::_compileShaderSource(GLenum shaderType, const char *
 	}
 }
 
-std::string gl4::DeferredShader::_getPartOfString(std::string s, std::string s1, std::string s2) 
+std::string gl4::DeferredShader::_getPartOfString(std::string s, std::string s1, std::string s2, std::string nothing) 
 {
-	unsigned found1 = s.find(s1);
+	size_t found1 = s.find(s1);
 
-	if (found1 ==std::string::npos)
-		return empty;
+	if (found1 ==s.npos)
+		return nothing;
 
-	unsigned found2 = s.find(s2,found1+1);
-	if (found2==std::string::npos)
-		return empty;
+	size_t found2 = s.find(s2,found1+1);
+	if (found2==s.npos)
+		return nothing;
 
 	return s.substr(found1,found2-found1);
 }

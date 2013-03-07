@@ -49,11 +49,12 @@ void gl4::DeferredRender::init(unsigned int windowWidth, unsigned int windowHeig
 	_orthogonalProjectionMatrix = Orthogonal * OrthogonalView;
 
 	addExtendedDeferredShaderFromFile(deferred1);
+	addExtendedDeferredShaderFromFile(deferred2, 0, true);
 }
 
-void gl4::DeferredRender::addExtendedDeferredShaderFromFile(std::string name, const char *filename)
+void gl4::DeferredRender::addExtendedDeferredShaderFromFile(std::string name, const char *filename, bool pass2)
 {
-	ShaderManager::getInstance()->addShaderProgram(name, new DeferredShader(filename));
+	ShaderManager::getInstance()->addShaderProgram(name, new DeferredShader(filename, pass2));
 }
 
 void gl4::DeferredRender::bindDefaultShader()
@@ -136,7 +137,7 @@ void gl4::DeferredRender::render(void (*renderFunc)(void))
 	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 	// render the FBO texture
-	_standard.bindTextures(3);
+	_standard.bindTextures();
 	_quad.render();
 
 	// unbind texture and shader

@@ -133,12 +133,8 @@ void myDeferredRenderFunc(void)
 	deferredEngine->useState(DEFERRED_TEXTURE, true);
 
 	// bind earth texture
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gl4::TextureManager::getInstance()->getTexture("earth_diffuse"));
-	glUniform1i(gl4::ShaderManager::getInstance()->getActiveShaderUniform(UNIFORM_TEXTURE1), 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D,  gl4::TextureManager::getInstance()->getTexture("earth_displacement"));
-	glUniform1i(gl4::ShaderManager::getInstance()->getActiveShaderUniform(UNIFORM_TEXTURE2), 1);
+	gl4::TextureManager::getInstance()->bindTexture("earth_diffuse");
+	//gl4::TextureManager::getInstance()->bindTexture("earth_displacement", 1);
 
 	// rotate around the x-axis and y-axis
 	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));

@@ -28,7 +28,7 @@ class FBO
 		void clear();
 
 		GLuint getTexture(GLuint i = 0);
-		void bindTextures(GLuint uniformStart);
+		void bindTextures();
 
 	private:
 		GLuint *_fboTextureId;

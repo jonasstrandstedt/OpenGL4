@@ -88,6 +88,19 @@ GLuint gl4::TextureManager::getTexture(std::string name)
 	}
 }
 
+void gl4::TextureManager::bindTexture(std::string name, unsigned int position)
+{
+    std::map< std::string,GLuint >::iterator it;
+    it = _textures.find(name);
+    if (it != _textures.end())
+    {
+
+        glActiveTexture(GL_TEXTURE0 + position);
+        glBindTexture(GL_TEXTURE_2D, (*it).second);
+        glUniform1i(UNIFORM_LOCATION(UNIFORM_TEXTURE1 + position), position);
+    }
+}
+
 /**
 * From:	http://stackoverflow.com/a/4777391
 */
