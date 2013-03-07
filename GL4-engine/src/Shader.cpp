@@ -17,7 +17,7 @@ gl4::Shader::Shader()
 {
 	_shaderProgram = 0;
 
-	for (int i = 0; i < 16; ++i)
+	for (int i = 0; i < 20; ++i)
 	{
 		_uniformLocations[i] = -1;
 	}

@@ -74,8 +74,13 @@ clean:
 	-@echo "Cleaning"
 	-$(RM) *.o
 	-$(RM) GL4-engine/src/*.o
+#-$(RM) GL4-engine/src/*.d
+
 
 
 # pattern that compiles all .o files
 %.o: %.cpp
 	$(CC) $(CXXFLAGS) $(INCPATH) -c $< -o $@
+
+#$(CC) -c $(CXXFLAGS) $(INCPATH) -MMD -MF $(patsubst %.o,%.d,$@) -o $@ $<
+#$(CC) $(CXXFLAGS) $(INCPATH) -c $< -o $@

@@ -65,11 +65,17 @@ void gl4::DeferredRender::bindDefaultShader()
 void gl4::DeferredRender::bindShader(std::string shader)
 {
 	ShaderManager::getInstance()->bindShader(shader);
-	glUniform1f(UNIFORM_LOCATION(UNIFORM_TIME), (float)glfwGetTime());
-	glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), _wireframe);
-	glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), _lightsource);
-	glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), 0);
-	glUniform2f(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE), _windowWidth, _windowHeight);
+	
+	if(UNIFORM_LOCATION(UNIFORM_TIME) != -1)
+		glUniform1f(UNIFORM_LOCATION(UNIFORM_TIME), (float)glfwGetTime());
+	if(UNIFORM_LOCATION(UNIFORM_WIREFRAME) != -1)
+		glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), _wireframe);
+	if(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE) != -1)
+		glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), _lightsource);
+	if(UNIFORM_LOCATION(UNIFORM_USETEXTURE) != -1)
+		glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), 0);
+	if(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE) != -1)
+		glUniform2f(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE), _windowWidth, _windowHeight);
 }
 
 void gl4::DeferredRender::enable(int state)
@@ -108,6 +114,7 @@ void gl4::DeferredRender::useState(int uniform, bool state)
 			glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), state);
 			break;
 		case DEFERRED_LIGHTSOURCE:
+			glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), state);
 			break;
 		case DEFERRED_TEXTURE:
 			glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), state);

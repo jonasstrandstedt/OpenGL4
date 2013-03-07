@@ -17,6 +17,8 @@ void GS(int i)
 void FS()
 {
 	float intensity = abs(sin(time));
-	diffuse = vec4(intensity,0,0,1);
+	lightmap = vec4(intensity,0,0,1);
+	//diffuse = vec4(0);
+	diffuse = lightmap;
 }
 //<!-- FS stop -->
