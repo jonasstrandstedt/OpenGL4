@@ -52,6 +52,14 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	GLint MaxSamples;
 	glGetIntegerv(GL_MAX_SAMPLES, &MaxSamples);
 	std::cout << "   MaxSamples = " << MaxSamples << std::endl;
+	if (samples < 0)
+	{
+		samples = 0;
+	}
+	if (samples > MaxSamples)
+	{
+		samples = MaxSamples;
+	}
 	if ( samples > 0 && samples <= MaxSamples)
 	{
 		_multisampled = true;
@@ -209,10 +217,20 @@ GLuint gl4::FBO::getTexture(GLuint i)
 
 void gl4::FBO::bindTextures()
 {
+	//std::cout << "Binding fbo textures:" << std::endl;
+	int texture = 0;
 	for (int i = 0; i < _textures; ++i)
 	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, _fboTextureId[i]);
-		glUniform1i(UNIFORM_LOCATION(UNIFORM_TEXTURE1 + i), i);
+		GLint loc = UNIFORM_LOCATION(UNIFORM_TEXTURE1 + i);
+		if (loc != -1)
+		{
+			//std::cout << "texture = " << texture << std::endl;
+			//std::cout << "loc = " << loc << std::endl;
+			//std::cout << "_fboTextureId[i] = " << _fboTextureId[i] << std::endl;
+			glActiveTexture(GL_TEXTURE0 + texture);
+			glBindTexture(GL_TEXTURE_2D, _fboTextureId[i]);
+			glUniform1i(loc, texture);
+			++texture;
+		}
 	}
 }

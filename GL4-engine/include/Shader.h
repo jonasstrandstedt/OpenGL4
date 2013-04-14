@@ -64,10 +64,12 @@ namespace gl4
 	private:
 		void _printUniform(std::ostream &out, const char *name, int uniform, bool set = false);
 		GLuint _compileShader(GLenum shaderType, const char *filename, const char *shaderString);
+
 	protected:
 		GLuint _shaderProgram;
 		GLint _uniformLocations[20];
 		char* _readShaderFile(const char *filename);
+		void _printSource(const char *source);
 	};
 }
 

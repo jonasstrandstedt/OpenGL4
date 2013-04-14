@@ -35,6 +35,8 @@ namespace gl4
 		void bindShader(std::string shader);
 		void unbindShader();
 
+		bool shaderExists(std::string name);
+
 		GLint getActiveShaderUniform(int uniform);
 
 	private:

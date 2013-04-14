@@ -10,15 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "Engine.h"
 #include "Sphere.h"
 
+// objects
 gl4::VBO *obj;
 gl4::Sphere *sphere;
 gl4::Engine *engine;
 gl4::DeferredRender *deferredEngine;
+
+// global settings
 glm::vec2 angle;
 bool wireframe = false;
 
-int tess;
-
+// callback functions
 void keyboardCallback(int key, int state);
 void myRenderFunc(void);
 void myDeferredRenderFunc(void);
@@ -56,16 +58,6 @@ int main(int argc, char **argv) {
 
 void keyboardCallback(int key, int state) 
 {
-	// increase and decrease tessellation levels
-	if(key == 'I' && state == GLFW_PRESS) {
-		if(tess < 64)
-			tess++;
-	}
-	if(key == 'O' && state == GLFW_PRESS) {
-		if(tess > 1)
-			tess--;
-	}
-
 	// toggle wireframe
 	if(key == 'W' && state == GLFW_PRESS) {
 		wireframe = ! wireframe;
@@ -75,29 +67,38 @@ void keyboardCallback(int key, int state)
 
 void myInitFunc(void) 
 {
+	// init gl states
 	glEnable (GL_DEPTH_TEST);
 
 	angle[0] = 0.0f;
 	angle[1] = 0.0f;
+
+	// init plane
 	obj = new gl4::VBO();
 	obj->init();
 
+	// init sphere
 	sphere = new gl4::Sphere(1.0, 30);
 	sphere->init();
 
-	tess = 1;
-
 	// load textures
 	gl4::TextureManager::getInstance()->loadTexture("earth_diffuse", "data/earth_nasa_lowres.tga");
-	gl4::TextureManager::getInstance()->loadTexture("earth_displacement", "data/earth_nasa_topography_lowres.tga");
 
+	// get the deferred engine
 	deferredEngine = engine->getDeferredRender();
+
+	// load deferred shaders
 	deferredEngine->addExtendedDeferredShaderFromFile("plane", "data/shaders/DeferredUser.glsl");
+	deferredEngine->addExtendedDeferredShaderFromFile("texture", "data/shaders/DeferredUserTexture.glsl");
+	deferredEngine->addExtendedDeferredShaderFromFile("MySecondPass", "data/shaders/DeferredUserStep2.glsl", true);
+
+	deferredEngine->setSecondPassShader("MySecondPass");
 }
 
 void myRenderFunc(void) 
 {
-
+	//gl4::FontManager * fmgr = gl4::FontManager::getInstance();
+	//fmgr->printText(800 / 2.0 - 30,600 / 2.0+15.0f,"hej",20.0, glm::vec4(0.0,1.0,0.0,1.0));
 }
 
 /**
@@ -129,12 +130,10 @@ void myDeferredRenderFunc(void)
 	obj->render();
 
 	// switch back to default shader and activate textures
-	deferredEngine->bindDefaultShader();
-	deferredEngine->useState(DEFERRED_TEXTURE, true);
+	deferredEngine->bindShader("texture");
 
 	// bind earth texture
 	gl4::TextureManager::getInstance()->bindTexture("earth_diffuse");
-	//gl4::TextureManager::getInstance()->bindTexture("earth_displacement", 1);
 
 	// rotate around the x-axis and y-axis
 	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
@@ -147,11 +146,6 @@ void myDeferredRenderFunc(void)
 
 void myUpdateFunc(float dt)
 {
-	if(wireframe)
-		deferredEngine->enable(DEFERRED_WIREFRAME);
-	else
-		deferredEngine->disable(DEFERRED_WIREFRAME);
-
 	float speed = 50.0f;
 	if(engine->isKeyPressed(GLFW_KEY_RIGHT)) {
 		angle[1] += dt*speed;

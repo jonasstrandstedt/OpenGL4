@@ -11,16 +11,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "ShaderManager.h"
 #include "DeferredShader.h"
 
-const char *deferred1 = "Deferred1";
-const char *deferred2 = "Deferred2";
-
 
 gl4::DeferredRender::DeferredRender() 
 {
-	_wireframe = false;
-	_lightsource = false;
 	_windowWidth = 800;
 	_windowHeight = 600;
+	strcpy(deferred2, "Deferred2");
 }
 
 gl4::DeferredRender::~DeferredRender() 
@@ -57,6 +53,16 @@ void gl4::DeferredRender::addExtendedDeferredShaderFromFile(std::string name, co
 	ShaderManager::getInstance()->addShaderProgram(name, new DeferredShader(filename, pass2));
 }
 
+void gl4::DeferredRender::setSecondPassShader(const char *name)
+{
+	if (ShaderManager::getInstance()->shaderExists(name))
+	{
+		strcpy(deferred2, name);
+	} else {
+		std::cerr << "DeferredRender Error: Trying to set secondPass shader that does not exsis!" << std::endl;
+	}
+}
+
 void gl4::DeferredRender::bindDefaultShader()
 {
 	bindShader(deferred1);
@@ -68,61 +74,10 @@ void gl4::DeferredRender::bindShader(std::string shader)
 	
 	if(UNIFORM_LOCATION(UNIFORM_TIME) != -1)
 		glUniform1f(UNIFORM_LOCATION(UNIFORM_TIME), (float)glfwGetTime());
-	if(UNIFORM_LOCATION(UNIFORM_WIREFRAME) != -1)
-		glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), _wireframe);
-	if(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE) != -1)
-		glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), _lightsource);
-	if(UNIFORM_LOCATION(UNIFORM_USETEXTURE) != -1)
-		glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), 0);
 	if(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE) != -1)
 		glUniform2f(UNIFORM_LOCATION(UNIFORM_WINDOWSIZE), _windowWidth, _windowHeight);
 }
 
-void gl4::DeferredRender::enable(int state)
-{
-	switch(state) {
-		case DEFERRED_WIREFRAME:
-			_wireframe = true;
-			break;
-		case DEFERRED_LIGHTSOURCE:
-			_lightsource = true;
-			break;
-		default:
-			break;
-	}
-}
-
-void gl4::DeferredRender::disable(int state)
-{
-	switch(state) {
-		case DEFERRED_WIREFRAME:
-			_wireframe = false;
-			break;
-		case DEFERRED_LIGHTSOURCE:
-			_lightsource = false;
-			break;
-		default:
-			break;
-	}
-}
-
-void gl4::DeferredRender::useState(int uniform, bool state)
-{
-	//enable(state);
-	switch(uniform) {
-		case DEFERRED_WIREFRAME:
-			glUniform1i(UNIFORM_LOCATION(UNIFORM_WIREFRAME), state);
-			break;
-		case DEFERRED_LIGHTSOURCE:
-			glUniform1i(UNIFORM_LOCATION(UNIFORM_LIGHTSOURCE), state);
-			break;
-		case DEFERRED_TEXTURE:
-			glUniform1i(UNIFORM_LOCATION(UNIFORM_USETEXTURE), state);
-			break;
-		default:
-			break;
-	}
-}
 
 void gl4::DeferredRender::render(void (*renderFunc)(void))
 {

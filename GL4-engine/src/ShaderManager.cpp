@@ -66,7 +66,6 @@ void gl4::ShaderManager::bindShader(std::string shader)
 	it = _shaders.find(shader);
 	if (it != _shaders.end())
 	{
-		//std::cout << "Binding shader [" << shader << "]" << std::endl;
 		_activeShader = (*it).second;
 		glUseProgram( _activeShader->getShaderProgram());
 	} else {
@@ -80,6 +79,13 @@ void gl4::ShaderManager::unbindShader()
 {
 	_activeShader = 0;
 	glUseProgram( 0 );
+}
+
+bool gl4::ShaderManager::shaderExists(std::string name)
+{
+	std::map< std::string,Shader* >::iterator it;
+	it = _shaders.find(name);
+	return it != _shaders.end();
 }
 
 GLint gl4::ShaderManager::getActiveShaderUniform(int uniform)

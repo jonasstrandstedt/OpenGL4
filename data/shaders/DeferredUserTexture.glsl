@@ -5,6 +5,8 @@
 
 <!-- FS start -->
 
+passthrough();
 diffuse = texture(texture1, gs_st);
+
 
 <!-- FS stop -->

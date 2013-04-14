@@ -97,6 +97,7 @@ bool gl4::Engine::initGL() {
 		// make sure the managers are initialized
 		gl4::ShaderManager::getInstance();
 		gl4::TextureManager::getInstance();
+		gl4::FontManager::getInstance();
 
 		// init the fixed render target
 		_deferredRender.init(_windowWidth, _windowHeight);

@@ -31,6 +31,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "DeferredRender.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
+#include "FontManager.h"
 
 #define GL4_ENGINE_VERION_MAJOR 0
 #define GL4_ENGINE_VERION_MINOR 0

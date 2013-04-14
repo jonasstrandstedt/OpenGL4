@@ -85,6 +85,7 @@ void gl4::Shader::link()
 		_uniformLocations[UNIFORM_USETEXTURE] = glGetUniformLocation( _shaderProgram, "UseTexture");
 		_uniformLocations[UNIFORM_WINDOWSIZE] = glGetUniformLocation( _shaderProgram, "WindowSize");
 		_uniformLocations[UNIFORM_TIME] = glGetUniformLocation( _shaderProgram, "time");
+
 	}
 }
 
@@ -202,4 +203,29 @@ char* gl4::Shader::_readShaderFile(const char *filename)
 	std::fclose(file);
 
 	return buffer;
+}
+
+void gl4::Shader::_printSource(const char *source)
+{
+	int line = 0;
+	size_t newline = 0;
+	std::string stringsource = source;
+
+	std::cout << "Source:" << std::endl;
+	while(newline != stringsource.npos) {
+
+		size_t newline2 = stringsource.find_first_of("\n", newline+1);
+
+		int skip = 1;
+		if (line < 1)
+		{
+			skip = 0;
+		}
+		std::cout << std::setfill ('0') << std::setw (3);
+		std::cout << line << " |" <<stringsource.substr(newline+skip, newline2-newline -skip+1);
+
+		newline = newline2;
+		++line;
+	}
+
 }

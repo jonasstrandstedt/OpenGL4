@@ -25,12 +25,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "FBO.h"
 #include "VBO.h"
 
-enum {
-	DEFERRED_WIREFRAME = 0,
-	DEFERRED_LIGHTSOURCE,
-	DEFERRED_TEXTURE,
-};
-
 namespace gl4
 {
 	class DeferredRender
@@ -42,11 +36,10 @@ namespace gl4
 
 			void init(unsigned int windowWidth, unsigned int windowHeight);
 			void addExtendedDeferredShaderFromFile(std::string name, const char *filename = 0, bool pass2 = false);
+			void setSecondPassShader(const char *name);
+
 			void bindDefaultShader();
 			void bindShader(std::string shader);
-			void enable(int state);
-			void disable(int state);
-			void useState(int uniform, bool state);
 			void render(void (*f)(void));
 
 		private:
@@ -55,13 +48,12 @@ namespace gl4
 			unsigned int _windowHeight;
 			glm::mat4 _orthogonalProjectionMatrix;
 
-			// if's
-			bool _wireframe;
-			bool _lightsource;
-
 			// FBOs
 			FBO _standard;
 			VBO _quad;
+
+			const char *deferred1 = "Deferred1";
+			char deferred2[50];
 
 	};
 }

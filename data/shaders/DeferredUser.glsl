@@ -1,24 +1,13 @@
 
-//<!-- VS start -->
-void VS()
-{
+<!-- VS start --><!-- VS stop -->
 
-}
-//<!-- VS stop -->
+<!-- GS start --><!-- GS stop -->
 
-//<!-- GS start -->
-void GS(int i)
-{
+<!-- FS start -->
 
-}
-//<!-- GS stop -->
+float intensity = abs(sin(time));
+lightmap = vec4(intensity,0,0,1);
+//diffuse = vec4(0);
+diffuse = lightmap;
 
-//<!-- FS start -->
-void FS()
-{
-	float intensity = abs(sin(time));
-	lightmap = vec4(intensity,0,0,1);
-	//diffuse = vec4(0);
-	diffuse = lightmap;
-}
-//<!-- FS stop -->
+<!-- FS stop -->
