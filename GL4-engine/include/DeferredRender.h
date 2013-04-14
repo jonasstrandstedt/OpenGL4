@@ -52,7 +52,7 @@ namespace gl4
 			FBO _standard;
 			VBO _quad;
 
-			const char *deferred1 = "Deferred1";
+			char deferred1[50];
 			char deferred2[50];
 
 	};

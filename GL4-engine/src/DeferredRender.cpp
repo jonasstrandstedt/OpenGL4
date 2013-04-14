@@ -16,6 +16,7 @@ gl4::DeferredRender::DeferredRender()
 {
 	_windowWidth = 800;
 	_windowHeight = 600;
+	strcpy(deferred1, "Deferred1");
 	strcpy(deferred2, "Deferred2");
 }
 

@@ -203,7 +203,7 @@ vec4 bloom(){\n\
 			if (coordinate.x < 0.0 || coordinate.x > 1.0 || coordinate.y < 0.0 || coordinate.y > 1.0 )\n\
 			{\n\
 			} else {\n\
-				sum += texture2D(texture4, coordinate);\n\
+				sum += texture(texture4, coordinate);\n\
 			}\n\
 		}\n\
 	}\n\
