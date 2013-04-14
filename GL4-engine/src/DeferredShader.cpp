@@ -26,7 +26,6 @@ uniform sampler2D texture3;\n\
 uniform sampler2D texture4;\n\
 uniform vec3 uniform_color;\n\
 uniform vec2 WindowSize;\n\
-uniform float TessLevel;\n\
 in vec3 in_position;\n\
 in vec2 in_st;\n\
 in vec3 in_normal;\n\
@@ -59,10 +58,8 @@ uniform float time;\n\
 uniform sampler2D texture1;\n\
 uniform sampler2D texture2;\n\
 uniform sampler2D texture3;\n\
-uniform float TessLevel;\n\
-uniform bool Wireframe;\n\
-uniform bool Lightsource;\n\
-uniform bool UseTexture;\n\
+uniform sampler2D texture4;\n\
+uniform vec3 uniform_color;\n\
 uniform vec2 WindowSize;\n\
 in vec2 vs_st[3];\n\
 in vec3 vs_stp[3];\n\
@@ -111,10 +108,9 @@ uniform float time;\n\
 uniform sampler2D texture1;\n\
 uniform sampler2D texture2;\n\
 uniform sampler2D texture3;\n\
-uniform float TessLevel;\n\
-uniform bool Wireframe;\n\
-uniform bool Lightsource;\n\
-uniform bool UseTexture;\n\
+uniform sampler2D texture4;\n\
+uniform vec3 uniform_color;\n\
+uniform vec2 WindowSize;\n\
 in vec2 gs_st;\n\
 in vec3 gs_stp;\n\
 in vec4 gs_normal;\n\
@@ -146,7 +142,8 @@ uniform sampler2D texture1;\n\
 uniform sampler2D texture2;\n\
 uniform sampler2D texture3;\n\
 uniform sampler2D texture4;\n\
-uniform vec2 WindowSize;\n\
+uniform vec3 uniform_color;\n\
+uniform vec2 WindowSize = vec2(800,600);\n\
 in vec3 in_position;\n\
 in vec2 in_st;\n\
 in vec3 in_normal;\n\
@@ -177,6 +174,7 @@ uniform sampler2D texture1;\n\
 uniform sampler2D texture2;\n\
 uniform sampler2D texture3;\n\
 uniform sampler2D texture4;\n\
+uniform vec3 uniform_color;\n\
 uniform vec2 WindowSize = vec2(800,600);\n\
 in vec2 st;\n\
 in vec3 stp;\n\
@@ -188,28 +186,24 @@ void passthrough(){\n\
 	diffuse = texture(texture1, st);\n\
 }\n\
 vec4 bloom(){\n\
-	float blurSize_x = 1.0/100.0;\n\
-	float blurSize_y = 1.0/80.0;\n\
-	\n\
 	vec4 sum = vec4(0);\n\
 	int samples = 20; \n\
-	float quality =1.0; \n\
+	float quality =2.0; \n\
 	int diff = (samples - 1) / 2;\n\
 	vec2 sizeFactor = vec2(1) / WindowSize * quality;\n\
 	\n\
 	for (int x = -diff; x <= diff; x++){\n\
 		for (int y = -diff; y <= diff; y++){\n\
 			vec2 coordinate = st + vec2(x, y) * sizeFactor;\n\
-			if (coordinate.x < 0.0 || coordinate.x > 1.0 || coordinate.y < 0.0 || coordinate.y > 1.0 )\n\
-			{\n\
-			} else {\n\
-				sum += texture(texture4, coordinate);\n\
+			if (coordinate.x < 0.0 || coordinate.x > 1.0 || coordinate.y < 0.0 || coordinate.y > 1.0 ){\n\
+				} else {\n\
+					sum += texture(texture4, coordinate);\n\
+				}\n\
 			}\n\
 		}\n\
+		return sum / (samples*samples);\n\
 	}\n\
-	return sum / (samples*samples);\n\
-}\n\
-void main()\n\
+	void main()\n\
 {\n\
 	vec4 in_diffuse = texture(texture1, st);\n\
 	vec4 in_position = texture(texture2, st);\n\

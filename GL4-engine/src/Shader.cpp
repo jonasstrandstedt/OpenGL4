@@ -79,10 +79,7 @@ void gl4::Shader::link()
 		_uniformLocations[UNIFORM_TEXTURE6] = glGetUniformLocation( _shaderProgram, "texture6");
 		_uniformLocations[UNIFORM_TEXTURE7] = glGetUniformLocation( _shaderProgram, "texture7");
 		_uniformLocations[UNIFORM_TEXTURE8] = glGetUniformLocation( _shaderProgram, "texture8");
-		_uniformLocations[UNIFORM_TESSLEVEL] = glGetUniformLocation( _shaderProgram, "TessLevel");
-		_uniformLocations[UNIFORM_WIREFRAME] = glGetUniformLocation( _shaderProgram, "Wireframe");
-		_uniformLocations[UNIFORM_LIGHTSOURCE] = glGetUniformLocation( _shaderProgram, "Lightsource");
-		_uniformLocations[UNIFORM_USETEXTURE] = glGetUniformLocation( _shaderProgram, "UseTexture");
+		_uniformLocations[UNIFORM_COLOR] = glGetUniformLocation( _shaderProgram, "uniform_color");
 		_uniformLocations[UNIFORM_WINDOWSIZE] = glGetUniformLocation( _shaderProgram, "WindowSize");
 		_uniformLocations[UNIFORM_TIME] = glGetUniformLocation( _shaderProgram, "time");
 
@@ -107,10 +104,7 @@ void gl4::Shader::printUniforms(bool all)
 	_printUniform(std::cout, "UNIFORM_TEXTURE6", UNIFORM_TEXTURE6, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE7", UNIFORM_TEXTURE7, all);
 	_printUniform(std::cout, "UNIFORM_TEXTURE8", UNIFORM_TEXTURE8, all);
-	_printUniform(std::cout, "UNIFORM_TESSLEVEL", UNIFORM_TESSLEVEL, all);
-	_printUniform(std::cout, "UNIFORM_WIREFRAME", UNIFORM_WIREFRAME, all);
-	_printUniform(std::cout, "UNIFORM_LIGHTSOURCE", UNIFORM_LIGHTSOURCE, all);
-	_printUniform(std::cout, "UNIFORM_USETEXTURE", UNIFORM_USETEXTURE, all);
+	_printUniform(std::cout, "UNIFORM_COLOR", UNIFORM_TESSLEVEL, all);
 	_printUniform(std::cout, "UNIFORM_WINDOWSIZE", UNIFORM_WINDOWSIZE, all);
 }
 
@@ -227,5 +221,7 @@ void gl4::Shader::_printSource(const char *source)
 		newline = newline2;
 		++line;
 	}
+
+	std::cout << std::setfill (' ') << std::endl;
 
 }

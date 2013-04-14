@@ -90,9 +90,11 @@ void myInitFunc(void)
 	// load deferred shaders
 	deferredEngine->addExtendedDeferredShaderFromFile("plane", "data/shaders/DeferredUser.glsl");
 	deferredEngine->addExtendedDeferredShaderFromFile("texture", "data/shaders/DeferredUserTexture.glsl");
+	
+#ifndef __APPLE__
 	deferredEngine->addExtendedDeferredShaderFromFile("MySecondPass", "data/shaders/DeferredUserStep2.glsl", true);
-
 	deferredEngine->setSecondPassShader("MySecondPass");
+#endif
 }
 
 void myRenderFunc(void) 

@@ -92,7 +92,6 @@ bool gl4::Engine::initGL() {
 		std::sprintf (buffer, format, "GL4 Engine:", GL4_ENGINE_VERION_MAJOR, GL4_ENGINE_VERION_MINOR, GL4_ENGINE_VERION_REVISION );
 		std::cout << buffer << std::endl;
 		glfwSetWindowTitle( buffer );
-
 		
 		// make sure the managers are initialized
 		gl4::ShaderManager::getInstance();
