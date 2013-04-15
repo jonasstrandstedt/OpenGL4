@@ -33,6 +33,8 @@ gl4::VBO::~VBO()
 void gl4::VBO::init() 
 {
 	std::cout << "VBO Init()" << std::endl;
+		std::cout << "_vsize = " << _vsize << std::endl;
+		std::cout << "_isize = " << _isize << std::endl;
 
 	// if arrays not set from sub-class initialize with a colored quad
 	if(_vsize == 0 || _isize == 0 || _varray == NULL || _iarray == NULL) {

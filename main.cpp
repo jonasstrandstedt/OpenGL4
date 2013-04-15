@@ -9,12 +9,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 #include "Engine.h"
 #include "Sphere.h"
+#include "Model.h"
 
 // objects
 gl4::VBO *obj;
 gl4::Sphere *sphere;
 gl4::Engine *engine;
 gl4::DeferredRender *deferredEngine;
+gl4::Model *bunny;
 
 // global settings
 glm::vec2 angle;
@@ -81,6 +83,10 @@ void myInitFunc(void)
 	sphere = new gl4::Sphere(1.0, 30);
 	sphere->init();
 
+	// init bunny
+	bunny = new gl4::Model("data/obj/bunny.obj", "data/obj/bunny.png",glm::vec3(0.0,0.0,0.0),0.05,glm::vec3(0.0,0.0,0.0));
+	bunny->init();
+
 	// load textures
 	gl4::TextureManager::getInstance()->loadTexture("earth_diffuse", "data/earth_nasa_lowres.tga");
 
@@ -120,7 +126,17 @@ void myRenderFunc(void)
 */
 void myDeferredRenderFunc(void) 
 {
+
+	float s = 5.0;
+	deferredEngine->bindShader("plane");
+	glm::mat4 bunny_transform = glm::mat4(1.0);
+	bunny_transform = glm::scale(bunny_transform,glm::vec3(s,s,s));
+	bunny_transform = glm::rotate(bunny_transform,angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
+	bunny_transform = glm::rotate(bunny_transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
+	engine->usePerspectiveProjection(bunny_transform);
+	bunny->render();
 	
+	/*
 	// draw a colored plane with user defined deferred shader
 	deferredEngine->bindShader("plane");
 
@@ -143,6 +159,7 @@ void myDeferredRenderFunc(void)
 	
 	engine->usePerspectiveProjection(transform);
 	sphere->render();
+	*/
 	
 }
 

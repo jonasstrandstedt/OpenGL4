@@ -29,6 +29,8 @@ namespace gl4
 		glm::vec3 _position;
 		glm::mat4 _rotation;
 	protected:
+		std::string _texture;
+		glm::mat4 _transform;
 	};
 }
 
