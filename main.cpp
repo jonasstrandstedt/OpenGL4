@@ -126,7 +126,7 @@ void myRenderFunc(void)
 */
 void myDeferredRenderFunc(void) 
 {
-
+	/*
 	float s = 5.0;
 	deferredEngine->bindShader("plane");
 	glm::mat4 bunny_transform = glm::mat4(1.0);
@@ -135,8 +135,8 @@ void myDeferredRenderFunc(void)
 	bunny_transform = glm::rotate(bunny_transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
 	engine->usePerspectiveProjection(bunny_transform);
 	bunny->render();
+	*/
 	
-	/*
 	// draw a colored plane with user defined deferred shader
 	deferredEngine->bindShader("plane");
 
@@ -159,7 +159,7 @@ void myDeferredRenderFunc(void)
 	
 	engine->usePerspectiveProjection(transform);
 	sphere->render();
-	*/
+	
 	
 }
 
