@@ -17,12 +17,12 @@ Full support when gcc and necessary libraries is installed. I am using Ubuntu 12
 ###Mac OS X
 Mac OS X does not currently support OpenGL 4 but the core engine is not using OpenGL 4 specific functions and therefore Mac OS X is using OpenGL 3.2. 
 
-*NOTE:* The provided blur shader makes the computer lock/crash on Intel HD 3000 and is therefore disabled for Mac users by default.
+*NOTE: The provided blur shader makes the computer lock/crash on Intel HD 3000 and is therefore disabled for Mac users by default.*
 
 ###Windows
 There is windows support using MinGW and Msys installed in "C:/MinGW" and "C:/MinGW" and ""C:/MinGW"/msys" respectively. Use the provided bat files if you do not want to edit the PATH yourself.
 
-*NOTE:* I have not managed to compile libpng for MinGW and it is therefore disabled by default.
+*NOTE: I have not managed to compile libpng for MinGW and it is therefore disabled by default.*
 
 ###Libraries used
 - GLEW, http://glew.sourceforge.net/
