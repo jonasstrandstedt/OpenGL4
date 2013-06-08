@@ -32,9 +32,10 @@ OBJECTS += GL4-engine/src/Model.o
 OBJECTS += GL4-engine/src/Geometry.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
-OUTPUT ?= Program
 ifeq ($(OS),MinGW)
-	OUTPUT+=.exe
+	OUTPUT ?= Program.exe
+else
+	OUTPUT ?= Program
 endif
 
 # Compiler flags to the linker
@@ -60,7 +61,7 @@ ifdef OPENGL
 		INCPATH += -isystem"/usr/X11/include"
 		LFLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
 	else ifeq ($(OS),MinGW)
-		LFLAGS += -lglfw 
+		LFLAGS += -lglfw -L"GL4-engine/lib/mingw32" -lglew32 -lglu32 -lopengl32 
 	endif
 endif
 
