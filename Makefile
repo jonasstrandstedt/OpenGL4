@@ -39,7 +39,7 @@ ifeq ($(OS),MinGW)
 endif
 
 # Compiler flags to the linker
-FLAGS ?= -lpng
+LFLAGS ?= 
 
 # Compiler flags for all objects
 CXXFLAGS ?= 
@@ -49,17 +49,31 @@ INCPATH ?= -isystem"GL4-engine/include"
 
 # Specify what needs to be includes, OPENGL is given (but kept as option)
 OPENGL=1
+LIBPNG=
 
 # check if argument OPENGL=1 is set, reguires glfw to be properly installed
 ifdef OPENGL
 	MESSAGE += OpenGL,
 	ifeq ($(OS),Linux)
-		FLAGS += -lglfw -lGL -lGLU -lGLEW
+		LFLAGS += -lglfw -lGL -lGLU -lGLEW
 	else ifeq ($(OS),Darwin)
 		INCPATH += -isystem"/usr/X11/include"
-		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
+		LFLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
 	else ifeq ($(OS),MinGW)
-		FLAGS += -lglfw 
+		LFLAGS += -lglfw 
+	endif
+endif
+
+ifdef LIBPNG
+	MESSAGE += libpng,
+	ifeq ($(OS),Linux)
+		LFLAGS += -lpng
+		CXXFLAGS += -DLIBPNG
+	else ifeq ($(OS),Darwin)
+		LFLAGS += -lpng
+		CXXFLAGS += -DLIBPNG
+	else ifeq ($(OS),MinGW)
+		LFLAGS += 
 	endif
 endif
 
@@ -69,16 +83,13 @@ all: $(OBJECTS)
 	-@echo "Linking for $(OS)"
 	-@echo "Including $(MESSAGE)"
 	-@echo " "
-	$(CC) $(OBJECTS) $(INCPATH) $(CXXFLAGS) $(FLAGS) -o $(OUTPUT)
+	$(CC) $(OBJECTS) $(INCPATH) $(CXXFLAGS) $(LFLAGS) -o $(OUTPUT)
 
 # removes object files but not binaries
 clean:
 	-@echo "Cleaning"
 	-$(RM) *.o
 	-$(RM) GL4-engine/src/*.o
-#-$(RM) GL4-engine/src/*.d
-
-
 
 # pattern that compiles all .o files
 %.o: %.cpp

@@ -8,7 +8,11 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "TextureManager.h"
+
+#ifdef LIBPNG
 #include "png.h"
+#endif
+
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -90,15 +94,15 @@ GLuint gl4::TextureManager::getTexture(std::string name)
 
 void gl4::TextureManager::bindTexture(std::string name, unsigned int position)
 {
-    std::map< std::string,GLuint >::iterator it;
-    it = _textures.find(name);
-    if (it != _textures.end())
-    {
+	std::map< std::string,GLuint >::iterator it;
+	it = _textures.find(name);
+	if (it != _textures.end())
+	{
 
-        glActiveTexture(GL_TEXTURE0 + position);
-        glBindTexture(GL_TEXTURE_2D, (*it).second);
-        glUniform1i(UNIFORM_LOCATION(UNIFORM_TEXTURE1 + position), position);
-    }
+		glActiveTexture(GL_TEXTURE0 + position);
+		glBindTexture(GL_TEXTURE_2D, (*it).second);
+		glUniform1i(UNIFORM_LOCATION(UNIFORM_TEXTURE1 + position), position);
+	}
 }
 
 /**
@@ -108,28 +112,28 @@ bool gl4::TextureManager::_compare_extension(const char *filename, const char *e
 {
     /* Sanity checks */
 
-    if(filename == NULL || extension == NULL)
-        return false;
+	if(filename == NULL || extension == NULL)
+		return false;
 
-    if(strlen(filename) == 0 || strlen(extension) == 0)
-        return false;
+	if(strlen(filename) == 0 || strlen(extension) == 0)
+		return false;
 
-    if(strchr(filename, '.') == NULL || strchr(extension, '.') == NULL)
-        return false;
+	if(strchr(filename, '.') == NULL || strchr(extension, '.') == NULL)
+		return false;
 
     /* Iterate backwards through respective strings and compare each char one at a time */
 
-    for(int i = 0; i < strlen(filename); i++)
-    {
-        if(tolower(filename[strlen(filename) - i - 1]) == tolower(extension[strlen(extension) - i - 1]))
-        {
-            if(i == strlen(extension) - 1)
-                return true;
-        } else
-            break;
-    }
+	for(int i = 0; i < strlen(filename); i++)
+	{
+		if(tolower(filename[strlen(filename) - i - 1]) == tolower(extension[strlen(extension) - i - 1]))
+		{
+			if(i == strlen(extension) - 1)
+				return true;
+		} else
+		break;
+	}
 
-    return false;
+	return false;
 }
 
 /**
@@ -137,136 +141,140 @@ bool gl4::TextureManager::_compare_extension(const char *filename, const char *e
 */
 GLuint gl4::TextureManager::_loadTextureFromPNG(const char * file_name, int * width, int * height)
 {
-    png_byte header[8];
+#ifdef LIBPNG
+	png_byte header[8];
 
-    FILE *fp = fopen(file_name, "rb");
-    if (fp == 0)
-    {
-        perror(file_name);
-        return 0;
-    }
+	FILE *fp = fopen(file_name, "rb");
+	if (fp == 0)
+	{
+		perror(file_name);
+		return 0;
+	}
 
     // read the header
-    fread(header, 1, 8, fp);
+	fread(header, 1, 8, fp);
 
-    if (png_sig_cmp(header, 0, 8))
-    {
-        fprintf(stderr, "error: %s is not a PNG.\n", file_name);
-        fclose(fp);
-        return 0;
-    }
+	if (png_sig_cmp(header, 0, 8))
+	{
+		fprintf(stderr, "error: %s is not a PNG.\n", file_name);
+		fclose(fp);
+		return 0;
+	}
 
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png_ptr)
-    {
-        fprintf(stderr, "error: png_create_read_struct returned 0.\n");
-        fclose(fp);
-        return 0;
-    }
-
-    // create png info struct
-    png_infop info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr)
-    {
-        fprintf(stderr, "error: png_create_info_struct returned 0.\n");
-        png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-        fclose(fp);
-        return 0;
-    }
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!png_ptr)
+	{
+		fprintf(stderr, "error: png_create_read_struct returned 0.\n");
+		fclose(fp);
+		return 0;
+	}
 
     // create png info struct
-    png_infop end_info = png_create_info_struct(png_ptr);
-    if (!end_info)
-    {
-        fprintf(stderr, "error: png_create_info_struct returned 0.\n");
-        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
-        fclose(fp);
-        return 0;
-    }
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr)
+	{
+		fprintf(stderr, "error: png_create_info_struct returned 0.\n");
+		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+		fclose(fp);
+		return 0;
+	}
+
+    // create png info struct
+	png_infop end_info = png_create_info_struct(png_ptr);
+	if (!end_info)
+	{
+		fprintf(stderr, "error: png_create_info_struct returned 0.\n");
+		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
+		fclose(fp);
+		return 0;
+	}
 
     // the code in this if statement gets called if libpng encounters an error
-    if (setjmp(png_jmpbuf(png_ptr))) {
-        fprintf(stderr, "error from libpng\n");
-        png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-        fclose(fp);
-        return 0;
-    }
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		fprintf(stderr, "error from libpng\n");
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		fclose(fp);
+		return 0;
+	}
 
     // init png reading
-    png_init_io(png_ptr, fp);
+	png_init_io(png_ptr, fp);
 
     // let libpng know you already read the first 8 bytes
-    png_set_sig_bytes(png_ptr, 8);
+	png_set_sig_bytes(png_ptr, 8);
 
     // read all the info up to the image data
-    png_read_info(png_ptr, info_ptr);
+	png_read_info(png_ptr, info_ptr);
 
     // variables to pass to get info
-    int bit_depth, color_type;
-    png_uint_32 temp_width, temp_height;
+	int bit_depth, color_type;
+	png_uint_32 temp_width, temp_height;
 
     // get info about png
-    png_get_IHDR(png_ptr, info_ptr, &temp_width, &temp_height, &bit_depth, &color_type,
-        NULL, NULL, NULL);
+	png_get_IHDR(png_ptr, info_ptr, &temp_width, &temp_height, &bit_depth, &color_type,
+		NULL, NULL, NULL);
 
-    if (width != 0){ *width = temp_width; }
-    if (height != 0){ *height = temp_height; }
+	if (width != 0){ *width = temp_width; }
+	if (height != 0){ *height = temp_height; }
 
     // Update the png info struct.
-    png_read_update_info(png_ptr, info_ptr);
+	png_read_update_info(png_ptr, info_ptr);
 
     // Row size in bytes.
-    int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+	int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
     // glTexImage2d requires rows to be 4-byte aligned
-    rowbytes += 3 - ((rowbytes-1) % 4);
+	rowbytes += 3 - ((rowbytes-1) % 4);
 
     // Allocate the image_data as a big block, to be given to opengl
-    png_byte * image_data;
-    image_data = (png_byte*)std::malloc(rowbytes * temp_height * sizeof(png_byte)+15);
-    if (image_data == NULL)
-    {
-        fprintf(stderr, "error: could not allocate memory for PNG image data\n");
-        png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-        fclose(fp);
-        return 0;
-    }
+	png_byte * image_data;
+	image_data = (png_byte*)std::malloc(rowbytes * temp_height * sizeof(png_byte)+15);
+	if (image_data == NULL)
+	{
+		fprintf(stderr, "error: could not allocate memory for PNG image data\n");
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		fclose(fp);
+		return 0;
+	}
 
     // row_pointers is for pointing to image_data for reading the png with libpng
-    png_bytep * row_pointers = (png_bytep*)std::malloc(temp_height * sizeof(png_bytep));
-    if (row_pointers == NULL)
-    {
-        fprintf(stderr, "error: could not allocate memory for PNG row pointers\n");
-        png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-        free(image_data);
-        fclose(fp);
-        return 0;
-    }
+	png_bytep * row_pointers = (png_bytep*)std::malloc(temp_height * sizeof(png_bytep));
+	if (row_pointers == NULL)
+	{
+		fprintf(stderr, "error: could not allocate memory for PNG row pointers\n");
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		free(image_data);
+		fclose(fp);
+		return 0;
+	}
 
     // set the individual row_pointers to point at the correct offsets of image_data
-    int i;
-    for (i = 0; i < temp_height; i++)
-    {
-        row_pointers[temp_height - 1 - i] = image_data + i * rowbytes;
-    }
+	int i;
+	for (i = 0; i < temp_height; i++)
+	{
+		row_pointers[temp_height - 1 - i] = image_data + i * rowbytes;
+	}
 
     // read the png into image_data through row_pointers
-    png_read_image(png_ptr, row_pointers);
+	png_read_image(png_ptr, row_pointers);
 
     // Generate the OpenGL texture object
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, temp_width, temp_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, temp_width, temp_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // clean up
-    png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-    free(image_data);
-    free(row_pointers);
-    fclose(fp);
-    return texture;
+	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+	free(image_data);
+	free(row_pointers);
+	fclose(fp);
+	return texture;
+#else 
+	return 0;
+#endif
 }
 
 GLuint gl4::TextureManager::_loadTextureFromTGA(const char *filename) {
