@@ -10,8 +10,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#ifdef _WIN32
+#define GLEW_STATIC 1
+#endif
+
 // GL related libraries
 #include <GL/glew.h>
+#ifdef _WIN32
+#include <GL/wglew.h>
+#endif
 #include <GL/glfw.h>
 
 // std libraries
