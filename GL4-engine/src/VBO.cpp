@@ -8,6 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "VBO.h"
+#include "Debug.h"
 #include <cstdlib>
 #include <iostream>
 
@@ -32,14 +33,14 @@ gl4::VBO::~VBO()
 
 void gl4::VBO::init() 
 {
-	std::cout << "VBO Init()" << std::endl;
-		std::cout << "_vsize = " << _vsize << std::endl;
-		std::cout << "_isize = " << _isize << std::endl;
+	LOG("VBO Init()\n");
+	LOG("   _vsize = %d\n", _vsize);
+	LOG("   _isize   = %d\n", _isize);
 
 	// if arrays not set from sub-class initialize with a colored quad
 	if(_vsize == 0 || _isize == 0 || _varray == NULL || _iarray == NULL) {
 
-		std::cout << "VBO: Init color quad" << std::endl;
+		LOG("VBO: Init color quad\n");
 		_mode = GL_TRIANGLES;
 
 		_vsize = 4;
@@ -139,11 +140,11 @@ void gl4::VBO::init()
 
 	if(_vBufferID == 0)
 	{
-		std::cerr << "Vertex buffer not initialized" << std::endl;
+		ERRLOG("Vertex buffer not initialized\n");
 	}
 	if(_iBufferID == 0) 
 	{
-		std::cerr << "Index buffer not initialized" << std::endl;
+		ERRLOG("Index buffer not initialized\n");
 	}
 
 	glBindVertexArray(0);
@@ -151,8 +152,8 @@ void gl4::VBO::init()
 	errorID = glGetError();
 	if(errorID != GL_NO_ERROR)
 	{
-		std::cerr << "OpenGL error: " << glewGetErrorString(errorID) << std::endl;
-		std::cerr << "Attempting to proceed anyway. Expect rendering errors or a crash." << std::endl;
+		ERRLOG("OpenGL error: %s\n", glewGetErrorString(errorID));
+		ERRLOG("Attempting to proceed anyway. Expect rendering errors or a crash.\n");
 	}
 
 }

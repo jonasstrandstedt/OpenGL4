@@ -105,8 +105,6 @@ void myInitFunc(void)
 
 void myRenderFunc(void) 
 {
-	//gl4::FontManager * fmgr = gl4::FontManager::getInstance();
-	//fmgr->printText(800 / 2.0 - 30,600 / 2.0+15.0f,"hej",20.0, glm::vec4(0.0,1.0,0.0,1.0));
 }
 
 /**

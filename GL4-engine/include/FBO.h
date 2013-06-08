@@ -21,6 +21,11 @@ class FBO
 	public:
 		FBO();
 		~FBO();
+
+		void setTextureFormat(GLenum f);
+		void setColorFormat(GLenum f);
+
+		void setClearColor(float r, float g, float b, float a);
 		
 		void init(GLuint width, GLuint height, GLuint samples = 0, GLuint textures = 1);
 		void bind();
@@ -41,6 +46,10 @@ class FBO
 
 		int _w;
 		int _h;
+
+		GLenum _textureFormat;
+		GLenum _colorFormat;
+		float _clearColor[4];
 };
 }
 

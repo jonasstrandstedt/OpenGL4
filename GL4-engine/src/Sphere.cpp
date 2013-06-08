@@ -25,11 +25,12 @@ gl4::Sphere::Sphere(float radius, int segments, bool tessellation)
 	_varray = (Vertex*) std::malloc(_vsize*sizeof(Vertex));
 	_iarray = (int*) std::malloc(_isize*sizeof(int));
 
-	std::cout 	<< "Initializing sphere with: " << std::endl
-				<< "   segments = " << segments << std::endl
-				<< "   radius = " << radius << std::endl
-				<< "   _vsize = " << _vsize << std::endl
-				<< "   _isize = " << _isize << std::endl;
+
+	LOG("Initializing sphere with:\n");
+	LOG("   segments = %d\n", segments);
+	LOG("   radius   = %f\n", radius);
+	LOG("   _vsize   = %d\n", _vsize);
+	LOG("   _isize   = %d\n", _isize);
 
 	// define PI
 	const float PI = 3.14159265;

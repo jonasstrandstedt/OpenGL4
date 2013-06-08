@@ -29,16 +29,13 @@ gl4::TextureManager* gl4::TextureManager::getInstance()
 
 gl4::TextureManager::TextureManager()
 {
-	std::cout << "Initializing TextureManager" << std::endl;
+	LOG("Initializing TextureManager\n");
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_GL_MAX_TEXTURE_SIZE);
 	glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &_GL_MAX_TEXTURE_BUFFER_SIZE);
 
-	std::cout << "   GL_MAX_TEXTURE_SIZE = " << _GL_MAX_TEXTURE_SIZE << std::endl;
-	std::cout << "   GL_MAX_TEXTURE_BUFFER_SIZE = " << _GL_MAX_TEXTURE_BUFFER_SIZE << std::endl;
-
-
-
+	LOG("   _GL_MAX_TEXTURE_SIZE = %d\n", _GL_MAX_TEXTURE_SIZE);
+	LOG("   _GL_MAX_TEXTURE_BUFFER_SIZE = %d\n", _GL_MAX_TEXTURE_BUFFER_SIZE);
 }
 
 gl4::TextureManager::~TextureManager()
@@ -48,7 +45,7 @@ gl4::TextureManager::~TextureManager()
 
 void gl4::TextureManager::loadTexture(std::string name, const char *filename)
 {
-	std::cout << "Loading texture:" << std::endl;
+	LOG("Loading texture:\n");
 
 	GLuint textureID = 0;
 	std::map< std::string,GLuint >::iterator it;
@@ -62,20 +59,20 @@ void gl4::TextureManager::loadTexture(std::string name, const char *filename)
 		} else if(_compare_extension(filename, ".png")) {
 			textureID = _loadTextureFromPNG(filename);
 		} else {
-			std::cerr << "   Unsupported file format [" << filename<< "]" << std::endl;
+			ERRLOG("   Unsupported file format [ %s ]\n", filename);
 		}
 	} else {
-		std::cerr << "   Texture name already occupied! [" << name << "]" << std::endl;
+		ERRLOG("   Texture name already occupied! [ %s ]\n", name.c_str());
 	}
 
 	if (textureID == 0)
 	{
-		std::cerr << "   Loading texture failed!" << std::endl;
+		ERRLOG("   Loading texture failed!\n");
 	} else {
 		_textures.insert(std::pair<std::string,GLuint>(name,textureID));
-		std::cout << "   Name: " << name << std::endl;
-		std::cout << "   TextureID: " << textureID << std::endl;
-		std::cout << "   Loading texture success!" << std::endl;
+		LOG("   Name: %s\n", name.c_str());
+		LOG("   TextureID: %d\n", textureID);
+		LOG("   Loading texture success!\n");
 	}
 	
 }
@@ -282,7 +279,7 @@ GLuint gl4::TextureManager::_loadTextureFromTGA(const char *filename) {
 	GLFWimage img;
 
 	if(!glfwReadImage(filename, &img, GLFW_NO_RESCALE_BIT))
-		std::cerr << "   Failed to load texture from TGA file." << std::endl;
+		ERRLOG("   Failed to load texture from TGA file.\n");
 
 	glGenTextures(1, &textureID);
 	glActiveTexture(GL_TEXTURE0);

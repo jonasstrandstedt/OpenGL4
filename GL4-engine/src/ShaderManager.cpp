@@ -24,7 +24,7 @@ gl4::ShaderManager* gl4::ShaderManager::getInstance()
 
 gl4::ShaderManager::ShaderManager()
 {
-	std::cout << "Initializing ShaderManager" << std::endl;
+	LOG("Initializing ShaderManager\n");
 
 	// set the active shader to none
 	_activeShader = 0;
@@ -42,7 +42,7 @@ gl4::ShaderManager::~ShaderManager()
 
 void gl4::ShaderManager::addShaderProgram(std::string name, Shader *program)
 {
-	std::cout << "Adding shader program [ " << name << " ]: " << std::endl;
+	LOG("Adding shader program [ %s ]: \n",name.c_str());
 	program->printUniforms();
 	_shaders.insert(std::pair<std::string,Shader*>(name,program));
 }
@@ -69,7 +69,7 @@ void gl4::ShaderManager::bindShader(std::string shader)
 		_activeShader = (*it).second;
 		glUseProgram( _activeShader->getShaderProgram());
 	} else {
-		std::cerr << "ShaderManager could not find [ " << shader<< " ]" << std::endl;
+		ERRLOG("ShaderManager could not find [ %s ]: \n",shader.c_str());
 		_activeShader = 0;
 		glUseProgram(0);
 	}

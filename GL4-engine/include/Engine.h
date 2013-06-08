@@ -25,17 +25,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// debug related functions
+#include "Debug.h"
+
 // GL4-Engine related classes
 #include "FBO.h"
 #include "VBO.h"
 #include "DeferredRender.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
-#include "FontManager.h"
 
 #define GL4_ENGINE_VERION_MAJOR 0
 #define GL4_ENGINE_VERION_MINOR 0
 #define GL4_ENGINE_VERION_REVISION 1
+
+
 
 enum {
 	ENGINE_PRESS = 0,

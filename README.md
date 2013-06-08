@@ -1,6 +1,6 @@
 #OpenGL4
 
-A simple OpenGL 4 engine. The purpose is for me to learn OpenGL4 and create an engine that is easy to use in other projects.
+A simple OpenGL 4 engine. The purpose is for me to learn OpenGL4 and create an engine that is easy to use in other projects. The engine does not use OpenGL 4 specific functions due to backwards compatibily for Mac, but the engine makes it easy to include OpenGL 4.
 
 ##MIT-Licence
 Copyright (C) 2012-2014 Jonas Strandstedt
@@ -13,7 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ##Supported systems
 ###Linux
-Full support when gcc and necessary libraries is installed. I am using Ubuntu 12.04 and have installed the libraries through the package manager.
+Full support when gcc and necessary libraries is installed. I am using Ubuntu 12.10 and have installed the libraries through the package manager.
 ###Mac OS X
 Mac OS X does not currently support OpenGL4 but the features used should be able to port to Mac by using OpenGL 3.2 and GLSL 1.50. I am currently trying to enable the engine to work with Opengl version < 4.3.
 ###Windows

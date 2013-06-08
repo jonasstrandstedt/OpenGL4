@@ -20,16 +20,38 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 gl4::FBO::FBO() {
 	_fboId = -1;
-	//_fboTextureId = -1;
+	_fboTextureId = 0;
 	_fboId_multisampled = -1;
 	_w = 0;
 	_h = 0;
 	_multisampled= false;
 	_textures = 0;
+	_buffers = 0;
+	_textureFormat = GL_RGBA8;
+	_colorFormat = GL_RGBA;
+	for (int i = 0; i < 4; ++i)
+	{
+		_clearColor[i] = 0.0f;
+	}
 }
 
 gl4::FBO::~FBO() {
 	delete _fboTextureId;
+}
+
+void gl4::FBO::setTextureFormat(GLenum f) {
+	_textureFormat = f;
+}
+
+void gl4::FBO::setColorFormat(GLenum f) {
+	_colorFormat = f;
+}
+
+void gl4::FBO::setClearColor(float r, float g, float b, float a) {
+	_clearColor[0] = r;
+	_clearColor[1] = g;
+	_clearColor[2] = b;
+	_clearColor[3] = a;
 }
 
 void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures) {
@@ -47,11 +69,12 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	GLenum errorID;
 	GLenum status;
 
-	std::cout << "FBO: Initialize with size " << width << ", " << height << std::endl;
-	std::cout << "   Textures = " << textures << std::endl;
 	GLint MaxSamples;
 	glGetIntegerv(GL_MAX_SAMPLES, &MaxSamples);
-	std::cout << "   MaxSamples = " << MaxSamples << std::endl;
+
+	LOG("FBO: Initialize with size %d, %d\n", width, height);
+	LOG("   Textures =  %d\n", textures);
+	LOG("   MaxSamples =  %d\n", MaxSamples);
 	if (samples < 0)
 	{
 		samples = 0;
@@ -60,10 +83,10 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	{
 		samples = MaxSamples;
 	}
-	if ( samples > 0 && samples <= MaxSamples)
+	if ( samples > 1 && samples <= MaxSamples)
 	{
 		_multisampled = true;
-		std::cout << "   Samples = " << samples << std::endl;
+		LOG("   Samples =  %d\n", samples);
 	}
 
 
@@ -79,7 +102,7 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	{
 		_buffers[i] = GL_COLOR_ATTACHMENT0+i;
 		glBindRenderbuffer(GL_RENDERBUFFER, _rboId[i]);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
+		glRenderbufferStorage(GL_RENDERBUFFER, _colorFormat, width, height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_RENDERBUFFER, _rboId[i]);
 	}
 	
@@ -98,7 +121,7 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, _textureFormat, width, height, 0, _colorFormat, GL_UNSIGNED_BYTE, 0);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, _fboTextureId[i], 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -109,9 +132,9 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	// check FBO status
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "   " << "Error creating FBO: " << status << std::endl;
+		ERRLOG("   Error creating FBO: %d\n", status);
 	else
-		std::cout << "   " << "FBO created successfully [" << _fboId << "]" <<  std::endl;
+		LOG("   FBO created successfully [%d]\n", _fboId);
 
 	// switch back to window-system-provided framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -128,7 +151,7 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 		for (int i = 0; i < textures; ++i)
 		{
 			glBindRenderbuffer(GL_RENDERBUFFER, _rboId_multisampled[i]);
-			glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA, width, height);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, _colorFormat, width, height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_RENDERBUFFER, _rboId_multisampled[i]);
 		}
 
@@ -142,9 +165,9 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 		// check FBO status
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if(status != GL_FRAMEBUFFER_COMPLETE)
-			std::cout << "   " << "Error creating FBO: " << status << std::endl;
+			ERRLOG("   Error creating FBO: %d\n", status);
 		else
-			std::cout << "   " << "Multisampled FBO created successfully [" << _fboId_multisampled << "]" <<  std::endl;
+			LOG("   Multisampled FBO created successfully  [%d]\n", _fboId_multisampled);
 
 		// switch back to window-system-provided framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -167,8 +190,8 @@ void gl4::FBO::bind() {
 	GLuint errorID = glGetError();
 	if(errorID != GL_NO_ERROR)
 	{
-		std::cerr 	<< " OpenGL error: " << glewGetErrorString(errorID) << std::endl
-					<< "Attempting to proceed anyway. Expect rendering errors or a crash." << std::endl;
+		ERRLOG("OpenGL error: %s\n", glewGetErrorString(errorID));
+		ERRLOG("Attempting to proceed anyway. Expect rendering errors or a crash.\n");
 	}
 }
 
@@ -197,14 +220,14 @@ void gl4::FBO::unbind() {
 
 void gl4::FBO::clear() {
 	glBindFramebuffer(GL_FRAMEBUFFER, _fboId);
-	glClearColor(0, 0, 0, 0);
+	glClearColor(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	if (_multisampled)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, _fboId_multisampled);
-		glClearColor(0, 0, 0, 0);
+		glClearColor(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -224,9 +247,6 @@ void gl4::FBO::bindTextures()
 		GLint loc = UNIFORM_LOCATION(UNIFORM_TEXTURE1 + i);
 		if (loc != -1)
 		{
-			//std::cout << "texture = " << texture << std::endl;
-			//std::cout << "loc = " << loc << std::endl;
-			//std::cout << "_fboTextureId[i] = " << _fboTextureId[i] << std::endl;
 			glActiveTexture(GL_TEXTURE0 + texture);
 			glBindTexture(GL_TEXTURE_2D, _fboTextureId[i]);
 			glUniform1i(loc, texture);

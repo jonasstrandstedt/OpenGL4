@@ -18,6 +18,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 enum {
 	UNIFORM_PROJECTION = 0,
 	UNIFORM_MODELTRANSFORM,
+	UNIFORM_TEXTURE0,
 	UNIFORM_TEXTURE1,
 	UNIFORM_TEXTURE2,
 	UNIFORM_TEXTURE3,
@@ -60,13 +61,13 @@ namespace gl4
 
 
 	private:
-		void _printUniform(std::ostream &out, const char *name, int uniform, bool set = false);
+		void _printUniform(const char *name, int uniform, bool set = false);
 		GLuint _compileShader(GLenum shaderType, const char *filename, const char *shaderString);
 
 	protected:
 		GLuint _shaderProgram;
 		GLint _uniformLocations[20];
-		char* _readShaderFile(const char *filename);
+		const char* _readShaderFile(const char *filename);
 		void _printSource(const char *source);
 	};
 }

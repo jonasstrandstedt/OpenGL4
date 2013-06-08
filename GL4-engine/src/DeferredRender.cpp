@@ -60,7 +60,7 @@ void gl4::DeferredRender::setSecondPassShader(const char *name)
 	{
 		strcpy(deferred2, name);
 	} else {
-		std::cerr << "DeferredRender Error: Trying to set secondPass shader that does not exsis!" << std::endl;
+		ERRLOG("%s\n", "DeferredRender Error: Trying to set secondPass shader that does not exsis!");
 	}
 }
 

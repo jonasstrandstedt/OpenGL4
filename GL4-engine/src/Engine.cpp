@@ -72,7 +72,7 @@ bool gl4::Engine::initGL() {
 
 		// fetching versions
 		char buffer [50];
-		const char *format = "%-12s %i.%i.%i";
+		const char *format = "%-12s %i.%i.%i\n";
 		int GLFWmajor = 0, GLFWminor = 0, GLFWrev = 0;
 		int OpenGLmajor = 0, OpenGLminor = 0, OpenGLrev = 0;
 		glfwGetVersion( &GLFWmajor, &GLFWminor, &GLFWrev );
@@ -80,23 +80,19 @@ bool gl4::Engine::initGL() {
 		OpenGLminor = glfwGetWindowParam(GLFW_OPENGL_VERSION_MINOR);
 
 		// printing versions
-		std::cout << "Using versions: " << std::endl;
-		std::sprintf (buffer, format, "GLFW:", GLFWmajor, GLFWminor, GLFWrev );
-		std::cout << buffer << std::endl;
-		std::sprintf (buffer, "%-12s %s", "GLEW:", glewGetString(GLEW_VERSION) );
-		std::cout << buffer << std::endl;
-		std::sprintf (buffer, format, "OpenGL:", OpenGLmajor, OpenGLminor, OpenGLrev );
-		std::cout << buffer << std::endl;
-		std::sprintf (buffer, "%-12s %s", "GLSL:", glGetString(GL_SHADING_LANGUAGE_VERSION) );
-		std::cout << buffer << std::endl;
+		LOG("%s\n", "Using versions:");
+		LOG(format, "GLFW:", GLFWmajor, GLFWminor, GLFWrev);
+		LOG("%-12s %s\n", "GLEW:", glewGetString(GLEW_VERSION) );
+		LOG(format, "OpenGL:", OpenGLmajor, OpenGLminor, OpenGLrev );
+		LOG("%-12s %s\n", "GLSL:", glGetString(GL_SHADING_LANGUAGE_VERSION) );
+
 		std::sprintf (buffer, format, "GL4 Engine:", GL4_ENGINE_VERION_MAJOR, GL4_ENGINE_VERION_MINOR, GL4_ENGINE_VERION_REVISION );
-		std::cout << buffer << std::endl;
+		LOG("%s",buffer );
 		glfwSetWindowTitle( buffer );
 		
 		// make sure the managers are initialized
 		gl4::ShaderManager::getInstance();
 		gl4::TextureManager::getInstance();
-		gl4::FontManager::getInstance();
 
 		// init the fixed render target
 		_deferredRender.init(_windowWidth, _windowHeight);
@@ -116,7 +112,7 @@ bool gl4::Engine::initGL() {
 	}
 
 	// if unable to open window, print error
-	std::cerr << "Could not open window" << std::endl;
+	ERRLOG("%s\n", "Could not open window");
 
 	return false;
 }

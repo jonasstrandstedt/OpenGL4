@@ -20,11 +20,11 @@ gl4::Model::Model(std::string filename, std::string texturename, glm::vec3 posit
 	std::ifstream ifile(filename.c_str());
 	if(ifile)
 	{
-		std::cout << "Found file.." << std::endl;
+		LOG("Found file..\n");
 		ifile.close();
 		loadObj(filename.c_str());
 	} else {
-		std::cerr << "Did not find file.." << std::endl;
+		ERRLOG("Did not find file..\n");
 	}
 
 	_transform = glm::mat4(1.0);
@@ -53,7 +53,7 @@ void gl4::Model::loadObj(const char *filename)
 	// START LINE COUNT
 	fi = fopen(filename, "r");
 	if (fi==NULL) {
-		printf("null object");
+		ERRLOG("Null Object\n");
 	}
 	while (fgets(line,150,fi)!=NULL)
 	{

@@ -9,11 +9,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 #include "DeferredShader.h"
+#include "Debug.h"
 
 #include <iostream>
 #include <iomanip>
 #include <cstring>
 
+#define MAX_SOURCE_SIZE 65536
 const char *empty = "passthrough();";
 
 const char *fixed_vs_pass1 = "#version 150\n\
@@ -248,12 +250,12 @@ gl4::DeferredShader::~DeferredShader()
 void gl4::DeferredShader::_generateVertexShader(const char *filename, const char *fixed_source)
 {
 	//const char * fixed_source = _readShaderFile("GL4-engine/shaders/Deferred1_VS_fixed.glsl");
-	char finalsource[16384];
+	char finalsource[MAX_SOURCE_SIZE];
 	strcpy(finalsource, fixed_source);
 	const char *usersource; 
 	if (filename != 0)
 	{
-		usersource = _getPartOfString(_readShaderFile(filename),"<!-- VS start -->","<!-- VS stop -->",empty).c_str();
+		usersource = _getPartOfString(_readShaderFile(filename),"<!-- VS start -->","<!-- VS stop -->",empty);
 		strcat(finalsource,usersource);
 	} else {
 		strcat(finalsource,empty);
@@ -270,12 +272,12 @@ void gl4::DeferredShader::_generateVertexShader(const char *filename, const char
 void gl4::DeferredShader::_generateFragmentShader(const char *filename, const char *fixed_source)
 {
 	//const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_FS_fixed.glsl");
-	char finalsource[16384];
+	char finalsource[MAX_SOURCE_SIZE];
 	strcpy(finalsource, fixed_source);
 	const char *usersource; 
 	if (filename != 0)
 	{
-		usersource = _getPartOfString(_readShaderFile(filename),"<!-- FS start -->","<!-- FS stop -->",empty).c_str();
+		usersource = _getPartOfString(_readShaderFile(filename),"<!-- FS start -->","<!-- FS stop -->",empty);
 		strcat(finalsource,usersource);
 	} else {
 		strcat(finalsource,empty);
@@ -293,12 +295,12 @@ void gl4::DeferredShader::_generateFragmentShader(const char *filename, const ch
 void gl4::DeferredShader::_generateGeometryShader(const char *filename, const char *fixed_source)
 {
 	//const char * source = _readShaderFile("GL4-engine/shaders/Deferred1_GS_fixed.glsl");
-	char finalsource[16384];
+	char finalsource[MAX_SOURCE_SIZE];
 	strcpy(finalsource, fixed_source);
 	const char *usersource; 
 	if (filename != 0)
 	{
-		usersource = _getPartOfString(_readShaderFile(filename),"<!-- GS start -->","<!-- GS stop -->",empty).c_str();
+		usersource = _getPartOfString(_readShaderFile(filename),"<!-- GS start -->","<!-- GS stop -->",empty);
 		strcat(finalsource,usersource);
 	} else {
 		strcat(finalsource,empty);
@@ -330,7 +332,7 @@ GLuint gl4::DeferredShader::_compileShaderSource(GLenum shaderType, const char *
 	{
 		// print errors 
 		glGetInfoLogARB( shader, sizeof(str), NULL, str );
-		std::cerr << shaderString << " shader compile error: " << str << std::endl;
+		ERRLOG("%s shader compile error: %s\n", shaderString, str);
 
 		// print the final source
 		_printSource(source);
@@ -340,7 +342,7 @@ GLuint gl4::DeferredShader::_compileShaderSource(GLenum shaderType, const char *
 	}
 }
 
-std::string gl4::DeferredShader::_getPartOfString(std::string s, std::string s1, std::string s2, std::string nothing) 
+const char* gl4::DeferredShader::_getPartOfString(std::string s, std::string s1, std::string s2, const char *nothing) 
 {
 	size_t found1 = s.find(s1);
 
@@ -358,5 +360,5 @@ std::string gl4::DeferredShader::_getPartOfString(std::string s, std::string s1,
 	if (stop == 0)
 		return nothing;
 
-	return s.substr(start,stop);
+	return s.substr(start,stop).c_str();
 }

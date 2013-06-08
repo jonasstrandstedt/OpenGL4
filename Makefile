@@ -27,7 +27,6 @@ OBJECTS += GL4-engine/src/ShaderManager.o
 OBJECTS += GL4-engine/src/Shader.o
 OBJECTS += GL4-engine/src/DeferredShader.o
 OBJECTS += GL4-engine/src/TextureManager.o
-OBJECTS += GL4-engine/src/FontManager.o
 OBJECTS += GL4-engine/src/Sphere.o
 OBJECTS += GL4-engine/src/Model.o
 OBJECTS += GL4-engine/src/Geometry.o
@@ -50,6 +49,7 @@ INCPATH ?= -isystem"GL4-engine/include"
 # Specify what needs to be includes, OPENGL is given (but kept as option)
 OPENGL=1
 LIBPNG=
+DEBUG=1
 
 # check if argument OPENGL=1 is set, reguires glfw to be properly installed
 ifdef OPENGL
@@ -75,6 +75,11 @@ ifdef LIBPNG
 	else ifeq ($(OS),MinGW)
 		LFLAGS += 
 	endif
+endif
+
+ifndef DEBUG
+	MESSAGE += debug,
+	CXXFLAGS += -DNDEBUG
 endif
 
 

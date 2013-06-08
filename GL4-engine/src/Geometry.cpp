@@ -20,7 +20,7 @@ gl4::Geometry::~Geometry()
 void gl4::Geometry::init() 
 {
 	VBO::init();
-	std::cout << "Geometry Init()" << std::endl;
+	LOG("Geometry Init()\n");
 
 	// if there is an geometry
 	if(_vsize > 0 && _isize > 0 && _varray != NULL && _iarray != NULL) {
