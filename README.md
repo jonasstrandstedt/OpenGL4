@@ -15,9 +15,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ###Linux
 Full support when gcc and necessary libraries is installed. I am using Ubuntu 12.10 and have installed the libraries through the package manager.
 ###Mac OS X
-Mac OS X does not currently support OpenGL4 but the features used should be able to port to Mac by using OpenGL 3.2 and GLSL 1.50. I am currently trying to enable the engine to work with Opengl version < 4.3.
+Mac OS X does not currently support OpenGL 4 but the core engine is not using OpenGL 4 specific functions and therefore Mac OS X is using OpenGL 3.2. 
+NOTE: The provided blur shader makes the computer lock/crash on Intel HD 3000 and is therefore disabled for Mac users by default.
 ###Windows
-I am not using Windows myself so porting feels a bit tricky. I have looked into it but with no success, I tried with mingw but was not able to compile all libraries. I will try using Visual Studio in the future.
+There is windows support using MinGW and Msys installed in "C:/MinGW" and "C:/MinGW" and ""C:/MinGW"/msys" respectively. Use the provided bat files if you do not want to edit the PATH yourself.
+NOTE: I have not managed to compile libpng for MinGW and it is therefore disabled by default.
 ###Libraries used
 - GLEW, http://glew.sourceforge.net/
 - GLFW, http://www.glfw.org/
