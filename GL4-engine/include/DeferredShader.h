@@ -25,7 +25,7 @@ namespace gl4
 
 	private:
 		GLuint _compileShaderSource(GLenum shaderType, const char *source, const char *shaderString);
-		const char* _getPartOfString(std::string s, std::string s1, std::string s2, const char *nothing = 0);
+		const char* _getPartOfString(std::string s, std::string s1, std::string s2, const char *nothing);
 
 		void _generateVertexShader(const char *filename, const char *fixed_source);
 		void _generateFragmentShader(const char *filename, const char *fixed_source);
