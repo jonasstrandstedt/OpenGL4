@@ -20,9 +20,7 @@ Mac OS X does not currently support OpenGL 4 but the core engine is not using Op
 *NOTE: The provided blur shader makes the computer lock/crash on Intel HD 3000 and is therefore disabled for Mac users by default.*
 
 ###Windows
-There is windows support using MinGW and Msys installed in "C:/MinGW" and "C:/MinGW" and ""C:/MinGW"/msys" respectively. Use the provided bat files if you do not want to edit the PATH yourself.
-
-*NOTE: I have not managed to compile libpng for MinGW and it is therefore disabled by default.*
+There is windows support using MinGW and msys. For pre-configured version of MinGW, see https://github.com/jonasstrandstedt/MinGW
 
 ###Libraries used
 - GLEW, http://glew.sourceforge.net/

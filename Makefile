@@ -49,7 +49,7 @@ INCPATH ?= -isystem"GL4-engine/include"
 
 # Specify what needs to be includes, OPENGL is given (but kept as option)
 OPENGL=1
-LIBPNG=
+LIBPNG=1
 DEBUG=1
 
 # check if argument OPENGL=1 is set, reguires glfw to be properly installed
@@ -61,7 +61,7 @@ ifdef OPENGL
 		INCPATH += -isystem"/usr/X11/include"
 		LFLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
 	else ifeq ($(OS),MinGW)
-		LFLAGS += -lglfw -L"GL4-engine/lib/mingw32" -lglew32 -lglu32 -lopengl32 
+		LFLAGS += -lglfw -lglew32 -lglu32 -lopengl32 
 	endif
 endif
 
@@ -74,7 +74,8 @@ ifdef LIBPNG
 		LFLAGS += -lpng
 		CXXFLAGS += -DLIBPNG
 	else ifeq ($(OS),MinGW)
-		LFLAGS += 
+		LFLAGS += -lpng -lz
+		CXXFLAGS += -DLIBPNG
 	endif
 endif
 
